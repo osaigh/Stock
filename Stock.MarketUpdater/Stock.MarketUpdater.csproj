@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Stock.API.Client\Stock.API.Client.csproj" />
+    <ProjectReference Include="..\Stock.Models\Stock.Models.csproj" />
+  </ItemGroup>
+
+</Project>

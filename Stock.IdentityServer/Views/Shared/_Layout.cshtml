@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/lib/bootstrap-v4-rtl/css/bootstrap.min.css"  rel="stylesheet"/>
+    @RenderSection("Styles", false)
+</head>
+<body>
+    <div>
+        @RenderBody()
+    </div>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap-v4-rtl/js/bootstrap.min.js"></script>
+    <script src="~/lib/popper.js/umd/popper.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
