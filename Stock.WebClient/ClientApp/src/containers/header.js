@@ -52,7 +52,8 @@ export function PageHeaderContainer({
             <PageHeader.UnOrderedList className={navBarNavClassNames}>
               <PageHeader.ListItem>{userGreeting}</PageHeader.ListItem>
               <PageHeader.ListItem className={navItemClassNames}>
-                <Button
+                              <Button style={{ color:"white"}
+}
                   className={navLinkClassNames}
                   onClick={() => {
                     signOut();
@@ -90,7 +91,7 @@ export function PageHeaderContainer({
           <PageHeader.DivContainer className={mlAutoClassNames}>
             <PageHeader.UnOrderedList className={navBarNavClassNames}>
               <PageHeader.ListItem className={navItemClassNames}>
-                <Button
+                <Button style={{ color:"white"}}
                   className={navLinkClassNames}
                   onClick={() => {
                     signIn();

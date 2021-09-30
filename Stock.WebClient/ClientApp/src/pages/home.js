@@ -30,7 +30,13 @@ export default function Home() {
   }, []);
 
   console.log("in Home");
-  const sideBarHome = <PageSideBar.NavLink to="/">Home</PageSideBar.NavLink>;
+    const sideBarHome = (
+        <PageSideBar.UnOrderedList >
+            <PageSideBar.ListItem>
+                <PageSideBar.NavLink to="/">Home</PageSideBar.NavLink>
+            </PageSideBar.ListItem>
+        </PageSideBar.UnOrderedList>
+        );
 
   var userGreetingClassNames = classNames("mt-2", "mr-1");
   var userGreeting = {};

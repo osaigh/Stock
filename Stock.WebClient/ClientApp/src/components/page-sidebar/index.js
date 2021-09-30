@@ -11,19 +11,19 @@ export default function PageSideBar({ children, ...restProps }) {
 }
 
 PageSideBar.NavLink = function PageSideBarNavLink({ children, ...restProps }) {
-  return <NavLink {...restProps}>{children}</NavLink>;
+    return <NavLink className="nav-link" {...restProps}>{children}</NavLink>;
 };
 
 PageSideBar.UnOrderedList = function PageSideBarUnOrderedList({
   children,
   ...restProps
 }) {
-  return <UnOrderedList {...restProps}>{children}</UnOrderedList>;
+    return <UnOrderedList className="navbar-nav" {...restProps}>{children}</UnOrderedList>;
 };
 
 PageSideBar.ListItem = function PageSideBarListItem({
   children,
   ...restProps
 }) {
-  return <ListItem {...restProps}>{children}</ListItem>;
+    return <ListItem className="nav-item" {...restProps}>{children}</ListItem>;
 };
