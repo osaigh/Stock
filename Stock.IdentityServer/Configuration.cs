@@ -73,21 +73,37 @@ namespace Stock.IdentityServer
             //                         };
 
             return new List<Client>(){
+                                         //new Client()
+                                         //{
+                                         //    ClientId = "client_id_react",
+                                         //    RedirectUris = { "http://localhost:3000/SignInCallback" },
+                                         //    PostLogoutRedirectUris = { "http://localhost:3000/Home/" },
+                                         //    AllowedGrantTypes = GrantTypes.Implicit,
+                                         //    AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "ApiOne","ApiTwo","StockAPI"},
+                                         //    AllowAccessTokensViaBrowser = true,
+                                         //    RequireClientSecret = false,
+                                         //    RequireConsent = false,
+                                         //    AllowedCorsOrigins = { "http://localhost:3000" },
+                                         //    AccessTokenLifetime = 1,
+                                         //},
                                          new Client()
                                          {
-                                             ClientId = "client_id_react",
-                                             RedirectUris = { "http://localhost:3000/SignInCallback" },
-                                             PostLogoutRedirectUris = { "http://localhost:3000/Home/" },
-                                             AllowedGrantTypes = GrantTypes.Implicit,
-                                             AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "ApiOne","ApiTwo","StockAPI"},
+                                             ClientId = "wpfclient",
+                                             FrontChannelLogoutUri = "http://127.0.0.1:44700/",
+                                             RedirectUris = { "http://127.0.0.1:44700/" },
+                                             PostLogoutRedirectUris = { "http://127.0.0.1:44700/" },
+                                             AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
+                                             AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "StockAPI"},
                                              AllowAccessTokensViaBrowser = true,
+                                             AllowOfflineAccess = true,
                                              RequireClientSecret = false,
                                              RequireConsent = false,
-                                             AllowedCorsOrigins = { "http://localhost:3000" },
+                                             AllowedCorsOrigins = { "http://127.0.0.1:44700" },
                                              AccessTokenLifetime = 1,
-                                         },
-                                         
+                                         }
+
                                      };
+
         }
 
 

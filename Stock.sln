@@ -13,9 +13,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.API.Tests", "Stock.AP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.API.Client", "Stock.API.Client\Stock.API.Client.csproj", "{BD946559-7DE5-4D5A-9699-BCE169913631}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.MarketUpdater", "Stock.MarketUpdater\Stock.MarketUpdater.csproj", "{C1A38D68-52E5-47EB-A19A-7791D8E768EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.WebClient", "Stock.WebClient\Stock.WebClient.csproj", "{6C45D15D-D955-486C-A0F0-CE1EDC712E0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.WebClient", "Stock.WebClient\Stock.WebClient.csproj", "{6C45D15D-D955-486C-A0F0-CE1EDC712E0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.MarketUpdater", "Stock.MarketUpdater\Stock.MarketUpdater.csproj", "{A4F3CBCD-7624-4706-A64D-3C22A55DD7A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.WpfClient.Common", "Stock.WpfClient.Common\Stock.WpfClient.Common.csproj", "{268DA74C-90A1-4851-99C7-11D414C7E8B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.WpfClient.Authentication", "Stock.WpfClient.Authentication\Stock.WpfClient.Authentication.csproj", "{EFCE2DC6-3B06-4270-AB29-D5CBB3E543B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.WpfClient.Desktop", "Stock.WpfClient.Desktop\Stock.WpfClient.Desktop.csproj", "{55E57C70-3D96-4235-82B3-2DB6166E63B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,14 +49,26 @@ Global
 		{BD946559-7DE5-4D5A-9699-BCE169913631}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD946559-7DE5-4D5A-9699-BCE169913631}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD946559-7DE5-4D5A-9699-BCE169913631}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C1A38D68-52E5-47EB-A19A-7791D8E768EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C1A38D68-52E5-47EB-A19A-7791D8E768EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C1A38D68-52E5-47EB-A19A-7791D8E768EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C1A38D68-52E5-47EB-A19A-7791D8E768EA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6C45D15D-D955-486C-A0F0-CE1EDC712E0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6C45D15D-D955-486C-A0F0-CE1EDC712E0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C45D15D-D955-486C-A0F0-CE1EDC712E0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C45D15D-D955-486C-A0F0-CE1EDC712E0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4F3CBCD-7624-4706-A64D-3C22A55DD7A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4F3CBCD-7624-4706-A64D-3C22A55DD7A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4F3CBCD-7624-4706-A64D-3C22A55DD7A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4F3CBCD-7624-4706-A64D-3C22A55DD7A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{268DA74C-90A1-4851-99C7-11D414C7E8B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{268DA74C-90A1-4851-99C7-11D414C7E8B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{268DA74C-90A1-4851-99C7-11D414C7E8B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{268DA74C-90A1-4851-99C7-11D414C7E8B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFCE2DC6-3B06-4270-AB29-D5CBB3E543B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFCE2DC6-3B06-4270-AB29-D5CBB3E543B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFCE2DC6-3B06-4270-AB29-D5CBB3E543B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFCE2DC6-3B06-4270-AB29-D5CBB3E543B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55E57C70-3D96-4235-82B3-2DB6166E63B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55E57C70-3D96-4235-82B3-2DB6166E63B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55E57C70-3D96-4235-82B3-2DB6166E63B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55E57C70-3D96-4235-82B3-2DB6166E63B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

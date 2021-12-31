@@ -121,12 +121,12 @@ namespace Stock.IdentityServer.Controllers
         public async Task<IActionResult> Logout(string logoutId)
         {
             await _signInManager.SignOutAsync();
-
             var logoutRequest = await _identityServerInteractionService.GetLogoutContextAsync(logoutId);
+            
 
             if (string.IsNullOrEmpty(logoutRequest.PostLogoutRedirectUri))
             {
-                //return RedirectToAction("Index", "Home");
+                return RedirectToAction("Login", "Auth");
             }
 
             return Redirect(logoutRequest.PostLogoutRedirectUri);
