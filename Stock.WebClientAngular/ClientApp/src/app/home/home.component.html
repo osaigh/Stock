@@ -1,0 +1,17 @@
+<div>
+    <app-page-header>
+
+    </app-page-header>
+    <div class="main-content">
+        <aside class="side-bar"></aside>
+        <div *ngIf="IsUserSignedIn == false">
+            <h3>Please Sign In</h3>
+        </div>
+        <div class="stock-container" *ngIf="IsUserSignedIn" >
+            <app-stock-container>
+            
+            </app-stock-container>
+        </div>
+        
+    </div>
+</div>

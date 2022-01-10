@@ -1,0 +1,62 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card strpied-tabled-with-hover">
+                <div class="card-header">
+                    <div class="card-title">Stocks</div>
+    
+                </div>
+                <div class="card-body">
+                    <p class="card-category">Stock prices and volume</p>
+                    <table class="table table-hover table-striped" id="stockTable">
+                        <thead>
+                            <tr>
+                                <th class="border-0">ID</th>
+                                <th class="border-0">Name</th>
+                                <th class="border-0">Price</th>
+                                <th class="border-0">Volume</th>
+                                <th class="border-0"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let stock of stocks; index as i">
+                                <td>{{i + 1}}</td>
+                                <td>{{stock.name}}</td>
+                                <td>${{stock.price}}</td>
+                                <td>{{stock.volume}}</td>
+                                <td>
+                                    <Button class="btn-primary" 
+                                    (click)="onViewHistory(stock.id)"
+                                        >
+                                        View History
+                                    </Button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" *ngIf="isChartVisible">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">{{chartTitle}}</div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-11" style="min-height: 500px;">
+                            <ngx-charts-line-chart [scheme]="colorScheme" [legend]="legend" [showXAxisLabel]="showXAxisLabel"
+                                [showYAxisLabel]="showYAxisLabel" [xAxis]="xAxis" [yAxis]="yAxis" [xAxisLabel]="xAxisLabel"
+                                [yAxisLabel]="yAxisLabel" [timeline]="timeline" [results]="multi" (select)="onSelect($event)"
+                                (activate)="onActivate($event)" (deactivate)="onDeactivate($event)">
+                            </ngx-charts-line-chart>
+                        </div>
+                        <div class="col-md-1">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>>

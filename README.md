@@ -32,6 +32,10 @@ A project demonstrating various web technologies and techniques. This is a Stock
 
 * A react based web client that authenticates the user using the Stock.IdentityServer and retrieves data from the Stock.API
 
+### Stock.WebClientAngular
+
+* An Angular based web client that authenticates the user using the Stock.IdentityServer and retrieves data from the Stock.API
+
 ### Stock.MarketUpdater
 
 * A c# console application that periodically updates the Stocks data.
@@ -39,10 +43,14 @@ A project demonstrating various web technologies and techniques. This is a Stock
 
 ## How to Run
 
-Debug the projects in the following order. 
+Debug the following projects. 
+*Test user account : username->'steam' password->'Qwert@1'
+*
+* Right-click on the solution file in visual studio. Select 'Properties' and select 'Multiple startup projects'
+* and set the following projects to 'Start'
 * Stock.IdentityServer
 * Stock.API
 * Stock.MarketUpdater
-* Stock.WebClient
+* Stock.WebClientAngular or Stock.WebClient
 
 

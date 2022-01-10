@@ -100,7 +100,7 @@ namespace Stock.IdentityServer
             //                         config.AppSecret = "";
             //                     });
 
-            services.ConfigureCorsPolicy(new List<string>(){ "https://localhost:44321", "http://127.0.0.1:44700" }, _configuration);
+            services.ConfigureCorsPolicy(new List<string>(){ "https://localhost:44321", "https://localhost:44343", "http://127.0.0.1:44700" }, _configuration);
 
             //services.AddCors(options =>
             //                 {
