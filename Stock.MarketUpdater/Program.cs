@@ -6,8 +6,8 @@ namespace Stock.MarketUpdater
 {
     public class Program
     {
-        protected readonly string _baseURL = "https://localhost:44368/api/";
-        protected readonly string _identityServerUrl = "https://localhost:44376/";
+        protected readonly string _baseURL = "http://localhost:44700/api/";
+        protected readonly string _identityServerUrl = "https://localhost:44701/";
         protected readonly string _clientId = "stock_api";
         protected readonly string _clientSecret = "dtkkb4ab34d9med859pgwrckvuvbhy";
         protected readonly string _scope = "StockAPI";

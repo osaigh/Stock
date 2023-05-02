@@ -41,13 +41,14 @@ namespace Stock.IdentityServer
         {
             services.AddControllersWithViews();
 
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            //string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             string migrationsAssembly = typeof(Startup).Assembly.GetName().Name;
 
             services.AddDbContext<ApplicationDbContext>(config =>
                                                         {
-                                                            config.UseSqlServer(connectionString);
+                                                            //config.UseSqlServer(connectionString);
+                                                            config.UseInMemoryDatabase("IdentityServer");
                                                         });
 
             services.AddIdentity<ApplicationUser, IdentityRole>(config =>
@@ -73,11 +74,11 @@ namespace Stock.IdentityServer
 
             var assembly = typeof(Startup).Assembly.GetName().Name;
             var filePath = Path.Combine(_environment.ContentRootPath, "stock.pfx");
-            var cert = new X509Certificate2(filePath,"password");
+            var cert = new X509Certificate2(filePath,"Password@1");
 
             services.AddIdentityServer()
                     .AddAspNetIdentity<ApplicationUser>()
-                    .AddConfigurationStore(options =>
+                    /*.AddConfigurationStore(options =>
                                            {
                                                options.ConfigureDbContext = b => b.UseSqlServer(connectionString,
                                                                                                 sql => sql.MigrationsAssembly(migrationsAssembly));
@@ -86,12 +87,12 @@ namespace Stock.IdentityServer
                                          {
                                              options.ConfigureDbContext = b => b.UseSqlServer(connectionString,
                                                                                               sql => sql.MigrationsAssembly(migrationsAssembly));
-                                         })
-                    //.AddSigningCredential(cert);
-                    //.AddInMemoryApiResources(Configuration.GetApis())
-                    //.AddInMemoryIdentityResources(Configuration.GetIdentityResources())
-                    //.AddInMemoryClients(Configuration.GetClients())
-                    .AddDeveloperSigningCredential();
+                                         })*/
+                    .AddSigningCredential(cert)
+                    .AddInMemoryApiResources(Configuration.GetApis())
+                    .AddInMemoryIdentityResources(Configuration.GetIdentityResources())
+                    .AddInMemoryClients(Configuration.GetClients());
+                    //.AddDeveloperSigningCredential();
 
             //services.AddAuthentication()
             //        .AddFacebook(config =>
@@ -100,7 +101,7 @@ namespace Stock.IdentityServer
             //                         config.AppSecret = "";
             //                     });
 
-            services.ConfigureCorsPolicy(new List<string>(){ "https://localhost:44321", "https://localhost:44343", "http://127.0.0.1:44700" }, _configuration);
+            services.ConfigureCorsPolicy(new List<string>(){ "https://localhost:44700", "http://localhost:44602", "http://127.0.0.1:44700" }, _configuration);
 
             //services.AddCors(options =>
             //                 {

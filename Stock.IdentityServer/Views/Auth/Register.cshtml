@@ -4,14 +4,18 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>Register</h1>
 
 <hr />
 
 <section>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-12 text-center">
+                <h1>Register</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 ml-0 mr-0 mx-auto">
                 <form asp-action="Register" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <input type="hidden" asp-for="ReturnUrl" />
@@ -46,7 +50,13 @@
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <input type="submit" value="Save" class="btn btn-primary" />
+                        
+                        <div style="display:flex; align-items:center; justify-content:space-between">
+                            <input type="submit" value="Save" class="btn btn-primary" />
+                        <div>
+   <a asp-action="Register" asp-controller="Auth">Register</a>
+</div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -54,9 +64,6 @@
     </div>
 </section>
 
-<div>
-    <a asp-route-returnUrl="@Model.ReturnUrl">Register</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

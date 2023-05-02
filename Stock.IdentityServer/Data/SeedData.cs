@@ -19,7 +19,7 @@ namespace Stock.IdentityServer.Data
         {
             using (var serviceScope = serviceProvider.GetService<IServiceScopeFactory>().CreateScope())
             {
-                serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
+                //serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
 
                 //test user
                 var appDbContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -37,7 +37,7 @@ namespace Stock.IdentityServer.Data
                 }
 
                 //config
-                var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+                /*var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
                 context.Database.Migrate();
                 if (!context.Clients.Any())
                 {
@@ -64,7 +64,7 @@ namespace Stock.IdentityServer.Data
                         context.ApiResources.Add(resource.ToEntity());
                     }
                     context.SaveChanges();
-                }
+                }*/
             }
         }
     }
