@@ -44,7 +44,7 @@ A project demonstrating various web technologies and techniques. This is a Stock
 ## How to Run
 
 Debug the following projects. 
-*Test user account : username->'steam' password->'Qwert@1'
+*Test user account : username->'bob' password->'password'
 *
 * Right-click on the solution file in visual studio. Select 'Properties' and select 'Multiple startup projects'
 * and set the following projects to 'Start'
