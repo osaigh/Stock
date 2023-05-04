@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button, Card, Table, Container, Row, Col } from "react-bootstrap";
-import ChartistGraph from "react-chartist";
 import Chart from '../../components/chart/Chart';
 import moment from "moment";
 import { StockApiContext } from "../../context/stock-api-context";

@@ -74,7 +74,7 @@ namespace Stock.IdentityServer
 
             var assembly = typeof(Startup).Assembly.GetName().Name;
             var filePath = Path.Combine(_environment.ContentRootPath, "stock.pfx");
-            var cert = new X509Certificate2(filePath,"Password@1");
+            //var cert = new X509Certificate2(filePath,"Password@1");
 
             services.AddIdentityServer()
                     .AddAspNetIdentity<ApplicationUser>()
@@ -88,11 +88,11 @@ namespace Stock.IdentityServer
                                              options.ConfigureDbContext = b => b.UseSqlServer(connectionString,
                                                                                               sql => sql.MigrationsAssembly(migrationsAssembly));
                                          })*/
-                    .AddSigningCredential(cert)
+                    //.AddSigningCredential(cert)
                     .AddInMemoryApiResources(Configuration.GetApis())
                     .AddInMemoryIdentityResources(Configuration.GetIdentityResources())
-                    .AddInMemoryClients(Configuration.GetClients());
-                    //.AddDeveloperSigningCredential();
+                    .AddInMemoryClients(Configuration.GetClients())
+                    .AddDeveloperSigningCredential();
 
             //services.AddAuthentication()
             //        .AddFacebook(config =>
