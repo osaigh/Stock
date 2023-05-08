@@ -1,4 +1,4 @@
-﻿<Window x:Class="Stock.WpfClient.Desktop.ShellWindow"
+﻿<ribbon:RibbonWindow x:Class="Stock.WpfClient.Desktop.ShellWindow"
         xmlns:prism="http://www.codeplex.com/prism"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,8 +6,47 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Stock.WpfClient.Desktop"
         xmlns:common="clr-namespace:Stock.WpfClient.Common;assembly=Stock.WpfClient.Common"
+        xmlns:ribbon="clr-namespace:System.Windows.Controls.Ribbon;assembly=System.Windows.Controls.Ribbon"
+        Title="Stock WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+         Height="450" Width="800">
+    <ribbon:RibbonWindow.Resources>
+        <Storyboard x:Key="OnSignedIn">
+            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="surveillance" Storyboard.TargetProperty="(UIElement.Opacity)">
+                <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0"/>
+                <SplineDoubleKeyFrame KeyTime="00:00:02" Value="0"/>
+                <SplineDoubleKeyFrame KeyTime="00:00:02.5000000" Value="1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="message" Storyboard.TargetProperty="(UIElement.Opacity)">
+                <SplineDoubleKeyFrame KeyTime="00:00:00" Value="1"/>
+                <SplineDoubleKeyFrame KeyTime="00:00:02" Value="1"/>
+                <SplineDoubleKeyFrame KeyTime="00:00:02.5000000" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="OnSignedOut">
+            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="surveillance" Storyboard.TargetProperty="(UIElement.Opacity)">
+                <SplineDoubleKeyFrame KeyTime="00:00:00" Value="1"/>
+                <SplineDoubleKeyFrame KeyTime="00:00:02" Value="1"/>
+                <SplineDoubleKeyFrame KeyTime="00:00:02.5000000" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="message" Storyboard.TargetProperty="(UIElement.Opacity)">
+                <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0"/>
+                <SplineDoubleKeyFrame KeyTime="00:00:02" Value="0"/>
+                <SplineDoubleKeyFrame KeyTime="00:00:02.5000000" Value="1"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </ribbon:RibbonWindow.Resources>
+    <ribbon:RibbonWindow.Triggers>
+        <EventTrigger RoutedEvent="local:ShellWindow.ContentLoaded">
+            <BeginStoryboard Storyboard="{StaticResource OnSignedIn}"/>
+        </EventTrigger>
+        <EventTrigger RoutedEvent="local:ShellWindow.ContentUnLoaded">
+            <BeginStoryboard Storyboard="{StaticResource OnSignedOut}"/>
+        </EventTrigger>
+        <EventTrigger RoutedEvent="local:ShellWindow.Loaded">
+            <BeginStoryboard Storyboard="{StaticResource OnSignedOut}"/>
+        </EventTrigger>
+    </ribbon:RibbonWindow.Triggers>
     <Grid x:Name="parentGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -17,7 +56,10 @@
         <ContentControl x:Name="header"
                         prism:RegionManager.RegionName="{x:Static common:RegionNames.HeaderRegion}" 
                         ></ContentControl>
-        <Grid Grid.Row="1">
+        <ContentControl Grid.Row="1" x:Name="message"  prism:RegionManager.RegionName="{x:Static common:RegionNames.MessageRegion}" />
+
+        <ContentControl Margin="20,20,20,20" Grid.Row="1" Visibility="Collapsed" Opacity="0" x:Name="surveillance" prism:RegionManager.RegionName="{x:Static common:RegionNames.SurveillanceRegion}"/>
+        <!--<Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"></ColumnDefinition>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
@@ -26,6 +68,6 @@
             <ContentControl x:Name="charts" Grid.Column="1"
                                   
                             ></ContentControl>
-        </Grid>
+        </Grid>-->
     </Grid>
-</Window>
+</ribbon:RibbonWindow>

@@ -83,14 +83,26 @@ namespace Stock.WpfClient.Authentication.ViewModels
 
             //delegates
             _OnSignInDelegate = new OnSignInDelegate(OnSignIn);
+
+            //Register for events
+            _EventAggregator.GetEvent<SignedInEvent>().Subscribe(OnSignedInEventHandler);
+            _EventAggregator.GetEvent<SignedOutEvent>().Subscribe(OnSignedOutEventHandler);
         }
 
         protected void OnSignInExecuted()
         {
             Task.Run(async () =>
                      {
-                         var signedInResult = await _AuthenticationService.SignIn();
-                         Application.Current.Dispatcher.Invoke(_OnSignInDelegate, signedInResult);
+                         try
+                         {
+                             var signedInResult = await _AuthenticationService.SignIn();
+                             Application.Current.Dispatcher.Invoke(_OnSignInDelegate, signedInResult);
+                         }
+                         catch (Exception ex)
+                         {
+                             string t = "";
+                         }
+                         
                      });
         }
 
@@ -100,9 +112,10 @@ namespace Stock.WpfClient.Authentication.ViewModels
                      {
                          _AuthenticationService.SignOut();
                      });
-            this.SignedInVisibility = Visibility.Collapsed;
-            this.SignedOutVisibility = Visibility.Visible;
-            this.FirstName = string.Empty;
+
+            //Raise SignedOut Event
+            this._EventAggregator.GetEvent<SignedOutEvent>().Publish("SignedOut");
+            
         }
 
         #endregion
@@ -117,9 +130,9 @@ namespace Stock.WpfClient.Authentication.ViewModels
         {
             if (!signInResult.HasError)
             {
-                this.SignedInVisibility = Visibility.Visible;
-                this.SignedOutVisibility = Visibility.Collapsed;
-                this.FirstName = signInResult.User.FirstName ?? string.Empty;
+                //Raise SignedIn event
+                this._EventAggregator.GetEvent<SignedInEvent>().Publish(signInResult);
+                
             }
             else
             {
@@ -128,6 +141,23 @@ namespace Stock.WpfClient.Authentication.ViewModels
             }
         }
 
+        #endregion
+
+        #region Events
+        protected void OnSignedInEventHandler(object payload)
+        {
+            SignInResult signInResult = payload as SignInResult;
+            this.SignedInVisibility = Visibility.Visible;
+            this.SignedOutVisibility = Visibility.Collapsed;
+            this.FirstName = signInResult.User.FirstName ?? string.Empty;
+        }
+
+        protected void OnSignedOutEventHandler(object payload)
+        {
+            this.SignedInVisibility = Visibility.Collapsed;
+            this.SignedOutVisibility = Visibility.Visible;
+            this.FirstName = string.Empty;
+        }
         #endregion
     }
 }

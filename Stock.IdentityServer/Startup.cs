@@ -89,7 +89,8 @@ namespace Stock.IdentityServer
                                                                                               sql => sql.MigrationsAssembly(migrationsAssembly));
                                          })*/
                     //.AddSigningCredential(cert)
-                    .AddInMemoryApiResources(Configuration.GetApis())
+                    .AddInMemoryApiScopes(Configuration.GetApiScopes())
+                    .AddInMemoryApiResources(Configuration.GetApiResources())
                     .AddInMemoryIdentityResources(Configuration.GetIdentityResources())
                     .AddInMemoryClients(Configuration.GetClients())
                     .AddDeveloperSigningCredential();
@@ -101,7 +102,7 @@ namespace Stock.IdentityServer
             //                         config.AppSecret = "";
             //                     });
 
-            services.ConfigureCorsPolicy(new List<string>(){ "https://localhost:44700", "http://localhost:44602", "http://127.0.0.1:44700" }, _configuration);
+            services.ConfigureCorsPolicy(new List<string>(){ "https://localhost:44700", "http://localhost:44602", "http://127.0.0.1:44800", "http://localhost:44902" }, _configuration);
 
             //services.AddCors(options =>
             //                 {
@@ -113,6 +114,7 @@ namespace Stock.IdentityServer
             //                                                            .AllowAnyMethod();
             //                                                  });
             //                 });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

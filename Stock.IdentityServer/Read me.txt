@@ -1,1 +1,1 @@
-﻿//credentials username='steam' password='Qwert@1'
+﻿//credentials username='bob' password='password'

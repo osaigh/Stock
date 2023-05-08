@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -20,6 +21,8 @@ namespace Stock.WpfClient.Authentication.Services
         private User _user;
         private LoginResult _result;
         private BrowserProxy browser;
+        private int _port;
+        private string _redirectUri;
         #endregion
 
         #region Properties
@@ -30,7 +33,9 @@ namespace Stock.WpfClient.Authentication.Services
 
         public AuthenticationService()
         {
-            
+            _port = 44801;
+            //browser = new BrowserProxy(port, 300);
+            _redirectUri = string.Format($"http://127.0.0.1:{_port}/");
         }
         #endregion
 
@@ -44,25 +49,19 @@ namespace Stock.WpfClient.Authentication.Services
             return port;
         }
 
-
         protected void InitializeOidcClient()
         {
-            // create a redirect URI using an available port on the loopback address.
-            // requires the OP to allow random ports on 127.0.0.1 - otherwise set a static port
-            int port = 44700;
-            browser = new BrowserProxy(port, 300);
-            string redirectUri = string.Format($"http://127.0.0.1:{port}/");
 
             var options = new OidcClientOptions
-                          {
-                              Authority = "https://localhost:44376",
-                              ClientId = "wpfclient",
-                              RedirectUri = redirectUri,
-                              Scope = "openid profile email StockAPI offline_access",
-                              FilterClaims = false,
-                              Browser = browser,
-                              Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
-                              ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect
+            {
+                Authority = "https://localhost:44701",
+                ClientId = "wpfclient",
+                RedirectUri = _redirectUri,
+                Scope = "openid profile email StockAPI offline_access",
+                FilterClaims = false,
+                TokenClientCredentialStyle = IdentityModel.Client.ClientCredentialStyle.AuthorizationHeader
+                              //Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode
+                              //Browser = browser,
                           };
 
 
@@ -81,54 +80,88 @@ namespace Stock.WpfClient.Authentication.Services
                 InitializeOidcClient();
             }
 
+            string error = null;
             _result = null;
+            HttpListener http = null;
             try
             {
-                _result = await _oidcClient.LoginAsync(new LoginRequest());
+                http = GetHttpListener(_redirectUri);
+
+                var state = await _oidcClient.PrepareLoginAsync();
+
+                // open system browser to start authentication
+                Process.Start(state.StartUrl);
+
+                // wait for the authorization response.
+                var context = await http.GetContextAsync();
+
+                //get request data
+                var data = GetRequestData(context.Request);
+
+                //get authentication result
+                _result = await _oidcClient.ProcessResponseAsync(data, state);
             }
             catch (Exception ex)
             {
-                
+                Debug.WriteLine(ex);
+                error = ex.Message;
             }
+            finally
+            {
+                //stop the listener
+                if (http != null)
+                {
+                    http.Stop();
+                }
+
+                if(_result != null && _result.IsError)
+                {
+                    error = _result.Error;
+                }
+            }
+
             SignInResult signInResult = new SignInResult();
 
-            if (_result.IsError)
+            //if we have an error
+            if (!string.IsNullOrEmpty(error))
             {
                 signInResult.HasError = true;
                 signInResult.Errors = new List<string>();
-                signInResult.Errors.Add(_result.Error);
-            }
-
-            //get claims from user
-            if (_result.User != null)
-            {
-                _user = new User();
-                var usernameClaim = _result.User.FindFirst(c => c.Type.ToLower() == "UserName".ToLower());
-                if (usernameClaim != null && usernameClaim.Value != null)
-                {
-                    _user.UserName = usernameClaim.Value;
-                }
-
-                var firstNameClaim = _result.User.FindFirst(c => c.Type.ToLower() == "FirstName".ToLower());
-                if (firstNameClaim != null && firstNameClaim.Value != null)
-                {
-                    _user.FirstName = firstNameClaim.Value;
-                }
-
-                var lastNameClaim = _result.User.FindFirst(c => c.Type.ToLower() == "LastName".ToLower());
-                if (lastNameClaim != null && lastNameClaim.Value != null)
-                {
-                    _user.LastName = lastNameClaim.Value;
-                }
-
-                _user.AccessToken = _result.AccessToken;
-                signInResult.User = _user;
+                signInResult.Errors.Add(error);
             }
             else
             {
-                signInResult.HasError = true;
-                signInResult.Errors = new List<string>();
-                signInResult.Errors.Add("Unable to sign user in");
+                //get claims from user
+                if (_result.User != null)
+                {
+                    _user = new User();
+                    var usernameClaim = _result.User.FindFirst(c => c.Type.ToLower() == "UserName".ToLower());
+                    if (usernameClaim != null && usernameClaim.Value != null)
+                    {
+                        _user.UserName = usernameClaim.Value;
+                    }
+
+                    var firstNameClaim = _result.User.FindFirst(c => c.Type.ToLower() == "FirstName".ToLower());
+                    if (firstNameClaim != null && firstNameClaim.Value != null)
+                    {
+                        _user.FirstName = firstNameClaim.Value;
+                    }
+
+                    var lastNameClaim = _result.User.FindFirst(c => c.Type.ToLower() == "LastName".ToLower());
+                    if (lastNameClaim != null && lastNameClaim.Value != null)
+                    {
+                        _user.LastName = lastNameClaim.Value;
+                    }
+
+                    _user.AccessToken = _result.AccessToken;
+                    signInResult.User = _user;
+                }
+                else
+                {
+                    signInResult.HasError = true;
+                    signInResult.Errors = new List<string>();
+                    signInResult.Errors.Add("Unable to sign user in");
+                }
             }
 
             return signInResult;
@@ -142,19 +175,74 @@ namespace Stock.WpfClient.Authentication.Services
         {
             if (_oidcClient != null)
             {
-                await _oidcClient.LogoutAsync(new LogoutRequest()
-                                              {
-                                                IdTokenHint = _result?.IdentityToken
-                });
-                
+                HttpListener http = null;
+                try
+                {
+                    //http = GetHttpListener(_redirectUri);
+                    var url = await _oidcClient.PrepareLogoutAsync(new LogoutRequest()
+                    {
+                        IdTokenHint = _result?.IdentityToken
+                    });
+
+                    // open system browser to logout
+                    Process.Start(url);
+
+                }catch (Exception ex)
+                {
+                    Debug.Write(ex);
+                }
+                finally
+                {
+                    if(http != null)
+                    {
+                        http.Stop();
+                    }
+                }
+
             }
 
-            if (browser != null)
-            {
-                browser.KillProcess();
-            }
+            //if (browser != null)
+            //{
+            //    browser.KillProcess();
+            //}
             
             _user = null;
+        }
+
+        /// <summary>
+        /// Gets an HttpListener
+        /// </summary>
+        /// <param name="redirectUri"></param>
+        /// <returns></returns>
+        public HttpListener GetHttpListener(string redirectUri)
+        {
+            var http = new HttpListener();
+            http.Prefixes.Add(redirectUri);
+            http.Start();
+            return http;
+        }
+
+        /// <summary>
+        /// Gets the data from the request
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static string GetRequestData(HttpListenerRequest request)
+        {
+            //if (!request.HasEntityBody)
+            //{
+            //    return null;
+            //}
+
+            return request.RawUrl;
+
+            using (var body = request.InputStream)
+            {
+                using (var reader = new System.IO.StreamReader(body, request.ContentEncoding))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
         }
         #endregion
     }

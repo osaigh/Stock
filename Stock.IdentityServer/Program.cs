@@ -17,8 +17,9 @@ namespace Stock.IdentityServer
     {
         public static void Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
-
+            var builder = CreateHostBuilder(args);
+            
+            var host = builder.Build();
             host.Run();
         }
 
@@ -27,6 +28,10 @@ namespace Stock.IdentityServer
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.ConfigureKestrel(options =>
+                    {
+                        options.DisableStringReuse = false;
+                    });
                 });
     }
 }

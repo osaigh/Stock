@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Stock } from 'src/app/models';
 import { StockApiService } from 'src/app/services/stock-api.service';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { Color, NgxChartsModule, ScaleType } from '@swimlane/ngx-charts';
 import * as moment from 'moment';
 
 @Component({
@@ -27,10 +27,16 @@ export class StockContainerComponent implements OnInit {
   yAxisLabel: string = 'Price in ($)';
   timeline: boolean = true;
 
-  colorScheme = {
+  /* colorScheme = {
     domain: ['#5AA454', '#E44D25', '#CFC0BB', '#7aa3e5', '#a8385d', '#aae3f5']
-  };
+  }; */
 
+  colorScheme: Color = { 
+    domain: ['#99CCE5', '#FF7F7F'], 
+    group: ScaleType.Ordinal, 
+    selectable: true, 
+    name: 'Customer Usage', 
+};
   constructor(private stockApiService:StockApiService) { }
 
   ngOnInit(): void {

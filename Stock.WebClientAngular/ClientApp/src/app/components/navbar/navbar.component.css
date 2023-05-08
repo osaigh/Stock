@@ -1,0 +1,80 @@
+.navb {
+    height: 50px;
+    border-bottom: 0.5px solid rgb(231,228,228);
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #555;
+}
+
+.navb .wrapper{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    align-items: center;
+}
+
+.navb .wrapper .menu{
+    cursor: pointer;
+}
+
+.navb .wrapper .menu .icon{
+    font-size: 20px;
+}
+
+.navb .wrapper .search{
+    display:flex;
+    align-items: center;
+    border: 0.5px solid lightgray;
+    padding: 3px;
+}
+
+.navb .wrapper .search input{
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
+
+.navb .wrapper .search input::placeholder{
+    font-size:12px;
+}
+
+.navb .wrapper .items{
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    position: relative;
+}
+
+.navb .wrapper .items .icon{
+    width:30px;
+    height:30px;
+    font-size: 20px;
+}
+
+.navb .wrapper .items .avatar{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.navb .wrapper .items .counter{
+    width: 15px;
+    height: 15px;
+    background-color: red;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    position: absolute;
+    left:9px;
+    top:0px
+}
+
+.menu{
+    cursor: pointer;
+}

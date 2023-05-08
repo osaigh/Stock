@@ -12,6 +12,8 @@ using Prism.Modularity;
 using Prism.Unity;
 using Stock.WpfClient.Authentication;
 using Stock.WpfClient.Common.Services;
+using Stock.WpfClient.Desktop.ViewModels;
+using Stock.WpfClient.Surveillance;
 
 namespace Stock.WpfClient.Desktop
 {
@@ -23,6 +25,7 @@ namespace Stock.WpfClient.Desktop
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
             moduleCatalog.AddModule<AuthenticationModule>();
+            moduleCatalog.AddModule<SurveillanceModule>();
         }
 
         protected override Window CreateShell()
@@ -32,7 +35,7 @@ namespace Stock.WpfClient.Desktop
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            
+            containerRegistry.Register(typeof(IShellWindowViewModel), typeof(ShellWindowViewModel));
         }
     }
 }

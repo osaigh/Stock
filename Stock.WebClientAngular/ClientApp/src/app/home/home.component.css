@@ -1,20 +1,34 @@
-.main-content {
-  display: flex;
-  width: 100%;
-  height: 900px;
-  flex-direction: row;
-  align-items: stretch;
+.maincontent {
+  width: calc(100% - 280px);
+  height: 200px;
+  position: relative;
+  top: 0;
+  left: 280px;
+  transition: 0.7s ease;
 }
 
-.side-bar {
-  background-image: linear-gradient(
-    to right,
-    rgba(58, 59, 61, 1),
-    rgba(83, 85, 89, 1)
-  );
-  width: 200px;
+.maincontent.expand {
+  width: calc(100% - 60px);
+  left: 60px;
 }
 
 .stock-container {
   width: 100%;
+}
+
+.content{
+  padding-top: 20px;
+}
+
+/* Media Query for Mobile Devices */
+@media (max-width: 767px) {
+  .maincontent {
+      width: 100%;
+      left: 0px;
+  }
+
+  .maincontent.expand {
+      width: 100%;
+      left: 0;
+  }
 }

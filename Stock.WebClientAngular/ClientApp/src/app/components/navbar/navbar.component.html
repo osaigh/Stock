@@ -1,0 +1,31 @@
+<div class='navb'>
+    <div class='wrapper' >
+        <div class="menu" (click)="toggleState()">
+            <span class="icon"><i class="fa-solid fa-bars "></i></span>
+        </div>
+        <div *ngIf="IsUserSignedIn; else not_signed_in">
+            <div class="items">
+                <div class="items">
+                    <img src="../../assets/user2-160x160.jpg"
+                    alt=""
+                    class='avatar'
+                    />
+                </div>
+
+                <div class="items" >
+                    <button (click)="signOut()"  class='btn btn-primary' > Sign Out </button>
+                </div>
+                
+            </div>
+        </div>
+        <ng-template #not_signed_in>
+            <div class="items">
+                   
+                <div class="items" >
+                    <button (click)="signIn()" class='btn btn-primary'> Sign In </button>
+                </div>
+                
+            </div>
+        </ng-template>
+    </div>
+</div>

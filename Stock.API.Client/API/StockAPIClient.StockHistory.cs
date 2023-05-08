@@ -14,10 +14,10 @@ namespace Stock.APIClient.API
             return stockHistories;
         }
 
-        public async Task<StockHistory> GetStockHistory(int stockId)
+        public async Task<List<StockHistory>> GetStockHistory(int stockId)
         {
-            StockHistory stockHistory = await this.FetchAsync<StockHistory>("StockHistory/" + stockId);
-            return stockHistory;
+            List<StockHistory> stockHistories = await this.FetchAsync<List<StockHistory>>("StockHistory/" + stockId);
+            return stockHistories;
         }
     }
 }

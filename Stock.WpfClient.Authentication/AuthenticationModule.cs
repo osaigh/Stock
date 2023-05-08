@@ -20,6 +20,7 @@ namespace Stock.WpfClient.Authentication
             var regionManager = (IRegionManager)containerProvider.Resolve(typeof(IRegionManager));
             //var container = containerProvider.R
             regionManager.AddToRegion(RegionNames.HeaderRegion, containerProvider.Resolve(typeof(AuthenticationView)));
+            regionManager.AddToRegion(RegionNames.MessageRegion, containerProvider.Resolve(typeof(SignInMessageView)));
         }
 
         public void RegisterTypes(Prism.Ioc.IContainerRegistry containerRegistry)

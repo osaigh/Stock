@@ -10,9 +10,14 @@ namespace Stock.IdentityServer
 {
     public static class Configuration
     {
-        public static IEnumerable<ApiResource> GetApis()
+        public static IEnumerable<ApiResource> GetApiResources()
         {
             return new List<ApiResource>(){new ApiResource("ApiOne"), new ApiResource("ApiTwo"), new ApiResource("StockAPI") };
+        }
+
+        public static IEnumerable<ApiScope> GetApiScopes()
+        {
+            return new List<ApiScope>() { new ApiScope("ApiOne"), new ApiScope("ApiTwo"), new ApiScope("StockAPI") };
         }
 
         public static IEnumerable<IdentityResource> GetIdentityResources()
@@ -73,21 +78,20 @@ namespace Stock.IdentityServer
             //                         };
 
             return new List<Client>(){
-                /*new Client()
+                new Client()
                 {
                     ClientId = "client_id_angular",
-                    RedirectUris = { "http://localhost:44602/SignInCallback" },
-                    PostLogoutRedirectUris = { "http://localhost:44602" },
+                    RedirectUris = { "http://localhost:44902/SignInCallback" },
+                    PostLogoutRedirectUris = { "http://localhost:44902" },
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "ApiOne","ApiTwo","StockAPI"},
                     AllowAccessTokensViaBrowser = true,
                     RequireClientSecret = false,
                     RequireConsent = false,
-                    AllowedCorsOrigins = { "http://localhost:44602" },
+                    AllowedCorsOrigins = { "http://localhost:44902" },
                     AccessTokenLifetime = 1,
-                }*/
-                new Client()
-                {
+                },
+                new Client(){
                     ClientId = "client_id_react",
                     RedirectUris = { "http://localhost:44602/SignInCallback" },
                     PostLogoutRedirectUris = { "http://localhost:44602/Home/" },
@@ -98,22 +102,22 @@ namespace Stock.IdentityServer
                     RequireConsent = false,
                     AllowedCorsOrigins = { "http://localhost:44602" },
                     AccessTokenLifetime = 1,
+                },
+                new Client()
+                {
+                    ClientId = "wpfclient",
+                    FrontChannelLogoutUri = "http://127.0.0.1:44801/",
+                    RedirectUris = { "http://127.0.0.1:44801/" },
+                    PostLogoutRedirectUris = { "http://127.0.0.1:44801/" },
+                    AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
+                    AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "StockAPI"},
+                    AllowAccessTokensViaBrowser = true,
+                    AllowOfflineAccess = true,
+                    RequireClientSecret = false,
+                    RequireConsent = false,
+                    AllowedCorsOrigins = { "http://127.0.0.1:44801" },
+                    AccessTokenLifetime = 1,
                 }
-                //new Client()
-                //{
-                //    ClientId = "wpfclient",
-                //    FrontChannelLogoutUri = "http://127.0.0.1:44700/",
-                //    RedirectUris = { "http://127.0.0.1:44700/" },
-                //    PostLogoutRedirectUris = { "http://127.0.0.1:44700/" },
-                //    AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
-                //    AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "StockAPI"},
-                //    AllowAccessTokensViaBrowser = true,
-                //    AllowOfflineAccess = true,
-                //    RequireClientSecret = false,
-                //    RequireConsent = false,
-                //    AllowedCorsOrigins = { "http://127.0.0.1:44700" },
-                //    AccessTokenLifetime = 1,
-                //}
 
             };
 

@@ -3,36 +3,46 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ribbon="clr-namespace:System.Windows.Controls.Ribbon;assembly=System.Windows.Controls.Ribbon"
              xmlns:local="clr-namespace:Stock.WpfClient.Authentication.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    
-    <Border BorderBrush="Gray" BorderThickness="2" Height="50" VerticalAlignment="Top">
-        <Grid Height="50" VerticalAlignment="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+             >
 
-            <Label Content="Stocks" VerticalAlignment="Center" FontSize="24"></Label>
-            <Grid Grid.Column="2" Width="300">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="Hello" FontSize="18" VerticalAlignment="Center" Visibility="{Binding SignedInVisibility}"></Label>
-                <Label Content="James" Grid.Column="1" Margin="10,0,0,0" 
-                       FontSize="18" VerticalAlignment="Center" 
-                       Visibility="{Binding SignedInVisibility}"></Label>
-                <Button Grid.Column="2" FontSize="18" Width="70" 
-                        Command="{Binding SignInCommand}"
-                        Visibility="{Binding SignedOutVisibility}">SignIn</Button>
-                <Button Grid.Column="2" FontSize="18" Width="70" 
-                        Command="{Binding SignOutCommand}"
-                        Visibility="{Binding SignedInVisibility}">SignOut</Button>
-            </Grid>
-        </Grid>
-    </Border>
+    <ribbon:Ribbon x:Name="Ribbon" Title="Stock WPF">
+        <ribbon:Ribbon.HelpPaneContent>
+            <ribbon:RibbonButton />
+        </ribbon:Ribbon.HelpPaneContent>
+        <ribbon:Ribbon.QuickAccessToolBar>
+            <ribbon:RibbonQuickAccessToolBar >
+                <ribbon:RibbonButton x:Name="QATButton1" 
+                                         />
+                <ribbon:RibbonButton x:Name="QATButton2" 
+                                         />
+            </ribbon:RibbonQuickAccessToolBar>
+        </ribbon:Ribbon.QuickAccessToolBar>
+        <ribbon:Ribbon.ApplicationMenu>
+            <ribbon:RibbonApplicationMenu >
+                <ribbon:RibbonApplicationMenuItem Header="Hello _Ribbon"
+                                                      x:Name="MenuItem1"
+                                                      />
+            </ribbon:RibbonApplicationMenu>
+        </ribbon:Ribbon.ApplicationMenu>
+        <ribbon:RibbonTab x:Name="HomeTab" 
+                              Header="Home">
+            <ribbon:RibbonGroup x:Name="Group1" 
+                                    >
+                <ribbon:RibbonButton x:Name="SignIn" 
+                                         LargeImageSource="user.png"
+                                         Label="Sign In" Command="{Binding SignInCommand}"
+                                     Visibility="{Binding SignedOutVisibility}"
+                                     />
+                <ribbon:RibbonButton x:Name="SignOut" 
+                                     Command="{Binding SignOutCommand}"
+                                         LargeImageSource="user.png"
+                                     Visibility="{Binding SignedInVisibility}"
+                                         Label="Sign Out" />
+                
+            </ribbon:RibbonGroup>
+        </ribbon:RibbonTab>
+    </ribbon:Ribbon>
 </UserControl>

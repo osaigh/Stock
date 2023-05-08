@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Stock.WpfClient.Common.Events
 {
-    public class SignedInEvent : PubSubEvent<string>
+    public class SignedInEvent : PubSubEvent<object>
     {
     }
 }

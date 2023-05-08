@@ -9,7 +9,7 @@ namespace Stock.WpfClient.Common
     public class RegionNames
     {
         public const string HeaderRegion = "HeaderRegion";
-        public const string ReportRegion = "ReportRegion";
-        public const string ChartRegion = "ChartRegion";
+        public const string MessageRegion = "MessageRegion";
+        public const string SurveillanceRegion = "SurveillanceRegion";
     }
 }

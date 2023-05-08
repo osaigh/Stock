@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --port 44902",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -25,11 +25,13 @@
     "@fortawesome/free-regular-svg-icons": "^5.15.4",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.15",
+    "@ngrx/store": "^12.5.1",
     "@swimlane/ngx-charts": "^19.2.0",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "classnames": "^2.3.1",
     "colors": "^1.4.0",
+    "font-awesome": "^4.7.0",
     "jquery": "3.5.1",
     "moment": "^2.29.1",
     "oidc-client": "^1.11.5",
