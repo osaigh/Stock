@@ -25,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.WpfClient.Desktop", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.WpfClient.Surveillance", "Stock.WpfClient.Surveillance\Stock.WpfClient.Surveillance.csproj", "{F6CB0316-71F8-4DD1-8FA8-DEF78C8339B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.WebClientAngular", "Stock.WebClientAngular\Stock.WebClientAngular.csproj", "{A58FEEBE-D84E-45EA-84F1-E19CEB6F7A06}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.WebClientAngular", "Stock.WebClientAngular\Stock.WebClientAngular.csproj", "{B6D511DC-0D2E-480B-A429-CF65B1C70D76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,10 +77,10 @@ Global
 		{F6CB0316-71F8-4DD1-8FA8-DEF78C8339B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6CB0316-71F8-4DD1-8FA8-DEF78C8339B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6CB0316-71F8-4DD1-8FA8-DEF78C8339B3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A58FEEBE-D84E-45EA-84F1-E19CEB6F7A06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A58FEEBE-D84E-45EA-84F1-E19CEB6F7A06}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A58FEEBE-D84E-45EA-84F1-E19CEB6F7A06}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A58FEEBE-D84E-45EA-84F1-E19CEB6F7A06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6D511DC-0D2E-480B-A429-CF65B1C70D76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6D511DC-0D2E-480B-A429-CF65B1C70D76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6D511DC-0D2E-480B-A429-CF65B1C70D76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6D511DC-0D2E-480B-A429-CF65B1C70D76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

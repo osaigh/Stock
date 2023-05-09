@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve --port 44902",
     "build": "ng build",
+    "build:ssr": "ng run Stock.WebClientAngular:server:dev",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -18,6 +19,7 @@
     "@angular/forms": "~12.2.0",
     "@angular/platform-browser": "~12.2.0",
     "@angular/platform-browser-dynamic": "~12.2.0",
+    "@angular/platform-server": "~12.2.0",
     "@angular/router": "~12.2.0",
     "@fortawesome/fontawesome-free": "5.15.2",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
@@ -27,6 +29,7 @@
     "@fortawesome/react-fontawesome": "^0.1.15",
     "@ngrx/store": "^12.5.1",
     "@swimlane/ngx-charts": "^19.2.0",
+    "run-script-os": "^1.1.6",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "classnames": "^2.3.1",

@@ -74,9 +74,6 @@
             "development": {
               "browserTarget": "Stock.WebClientAngular:build:development"
               //"proxyConfig": "proxy.conf.js"
-            },
-            "options": {
-              "port": 44902
             }
           },
           "defaultConfiguration": "development"

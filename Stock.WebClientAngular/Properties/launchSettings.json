@@ -1,4 +1,4 @@
-﻿{
+{
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
@@ -11,11 +11,11 @@
     "Stock.WebClientAngular": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:5002",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
-      }
+      },
+      "applicationUrl": "http://localhost:5109"
     },
     "IIS Express": {
       "commandName": "IISExpress",
