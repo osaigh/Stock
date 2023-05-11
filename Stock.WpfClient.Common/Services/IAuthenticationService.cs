@@ -11,5 +11,7 @@ namespace Stock.WpfClient.Common.Services
     {
         Task<SignInResult> SignIn();
         Task SignOut();
+
+        User GetUserIdentity();
     }
 }

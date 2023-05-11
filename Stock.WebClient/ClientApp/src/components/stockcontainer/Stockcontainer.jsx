@@ -3,20 +3,28 @@ import { Button, Card, Table, Container, Row, Col } from "react-bootstrap";
 import Chart from '../../components/chart/Chart';
 import moment from "moment";
 import { StockApiContext } from "../../context/stock-api-context";
+import { UserAuthenticationContext } from "../../context/user-manager-context";
 import "./stockcontainer.scss"
 import "bootstrap/dist/css/bootstrap.min.css";
 
+
+
 export function StockContainer() {
   const [lineChartData, setLineChartData] = useState({ title: "", data: [] });
-  const [stocks, setStocks] = useState([]);
+    const [stocks, setStocks] = useState({user:null, stockData:[]});
   const { stockApiService } = useContext(StockApiContext);
+  const { userAuthenticationService } = useContext(UserAuthenticationContext);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      stockApiService.getAllStocks().then((response) => {
-        console.log(response.data);
-        setStocks(response.data);
-      });
+    const interval = setInterval(async () => {
+      let _user =await userAuthenticationService.getUserIdentity();
+      if(_user){
+          stockApiService.getAllStocks(_user.access_token).then((response) => {
+              console.log(response.data);
+              setStocks({ user: _user, stockData: response.data });
+          });
+      }
+      
     }, 5000);
 
     return () => clearInterval(interval);
@@ -27,23 +35,29 @@ export function StockContainer() {
   const getChartData = () => {
     var data = { labels: [], values: [] };
 
-    stocks.forEach((stock) => {
+    stocks.stockData.forEach((stock) => {
       data.labels.push(stock.name);
       data.values.push(stock.volume);
     });
   };
 
   const viewHistory = (stockId) => {
+    if (stocks.user == null) {
+      return;
+     }
+
     var stock = null;
-    stocks.forEach((st) => {
+    stocks.stockData.forEach((st) => {
       if (st.id == stockId) {
         stock = st;
       }
     });
+
     if (stock == null) {
       return;
     }
-    stockApiService.getStockHistory(stockId).then((response) => {
+
+    stockApiService.getStockHistory(stockId,stocks.user.access_token).then((response) => {
       var stockHistoryCollection = response.data;
       var newLineChartData = {
         title: stock.name,
@@ -53,7 +67,7 @@ export function StockContainer() {
     });
   };
 
-  var tableData = stocks.map((stock, index) => (
+  var tableData = stocks.stockData.map((stock, index) => (
     <tr key={index + 1}>
       <td>{index + 1}</td>
       <td>{stock.name}</td>
@@ -72,7 +86,7 @@ export function StockContainer() {
     </tr>
   ));
 
-  var legendItems = stocks.map((stock, index) => (
+  var legendItems = stocks.stockData.map((stock, index) => (
     <span>
       <i key={index} className="fas fa-circle text-info"></i>
       {stock.name}

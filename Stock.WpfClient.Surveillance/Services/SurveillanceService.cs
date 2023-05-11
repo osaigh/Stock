@@ -8,20 +8,6 @@ namespace Stock.WpfClient.Surveillance.Services
 {
     public class SurveillanceService: ISurveillanceService
     {
-        #region Fields
-
-        #endregion
-
-        #region Fields
-
-        #endregion
-
-        #region Fields
-
-        #endregion
-
-        #region Fields
-
-        #endregion
+       
     }
 }

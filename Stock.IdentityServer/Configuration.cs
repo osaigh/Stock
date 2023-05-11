@@ -85,11 +85,12 @@ namespace Stock.IdentityServer
                     PostLogoutRedirectUris = { "http://localhost:44902" },
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "ApiOne","ApiTwo","StockAPI"},
-                    AllowAccessTokensViaBrowser = true,
+                    AllowOfflineAccess = true,
                     RequireClientSecret = false,
+                    AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
                     AllowedCorsOrigins = { "http://localhost:44902" },
-                    AccessTokenLifetime = 1,
+                    AccessTokenLifetime = 3600,
                 },
                 new Client(){
                     ClientId = "client_id_react",
@@ -97,11 +98,12 @@ namespace Stock.IdentityServer
                     PostLogoutRedirectUris = { "http://localhost:44602/Home/" },
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "ApiOne","ApiTwo","StockAPI"},
-                    AllowAccessTokensViaBrowser = true,
+                    AllowOfflineAccess = true,
                     RequireClientSecret = false,
                     RequireConsent = false,
+                    AllowAccessTokensViaBrowser = true,
                     AllowedCorsOrigins = { "http://localhost:44602" },
-                    AccessTokenLifetime = 1,
+                    AccessTokenLifetime = 3600,
                 },
                 new Client()
                 {
@@ -116,7 +118,7 @@ namespace Stock.IdentityServer
                     RequireClientSecret = false,
                     RequireConsent = false,
                     AllowedCorsOrigins = { "http://127.0.0.1:44801" },
-                    AccessTokenLifetime = 1,
+                    AccessTokenLifetime = 3600,
                 }
 
             };

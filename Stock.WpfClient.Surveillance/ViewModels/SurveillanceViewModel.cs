@@ -2,6 +2,7 @@
 using Prism.Mvvm;
 using Stock.APIClient.API;
 using Stock.WpfClient.Common.Events;
+using Stock.WpfClient.Common.Services;
 using Stock.WpfClient.Surveillance.Charts;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace Stock.WpfClient.Surveillance.ViewModels
         protected readonly string _scope = "StockAPI";
         protected StockAPIClient _stockApiClient ;
         protected readonly IEventAggregator _EventAggregator;
+        protected readonly IAuthenticationService _AuthenticationService;
         protected bool _keepRunning = false;
         object objLock = "lock";
         #endregion
@@ -146,9 +148,10 @@ namespace Stock.WpfClient.Surveillance.ViewModels
         #endregion
 
         #region Constructor
-        public SurveillanceViewModel(IEventAggregator eventAggregator)
+        public SurveillanceViewModel(IEventAggregator eventAggregator, IAuthenticationService authenticationService)
         {
             _EventAggregator = eventAggregator;
+            _AuthenticationService = authenticationService;
             Initialize();
         }
         #endregion
@@ -178,7 +181,8 @@ namespace Stock.WpfClient.Surveillance.ViewModels
                     {
                         if (_keepRunning)
                         {
-                            var stocks = _stockApiClient.GetStocks().GetAwaiter().GetResult();
+                            var user = _AuthenticationService.GetUserIdentity();
+                            var stocks = _stockApiClient.GetStocks(user.AccessToken).GetAwaiter().GetResult();
                             Application.Current.Dispatcher.Invoke(_OnStockUpdateDelegate, stocks);
                         }
                         else
@@ -211,7 +215,8 @@ namespace Stock.WpfClient.Surveillance.ViewModels
             
             //call the api to get the stockhistory data
             var stockApiClient = new StockAPIClient(_baseURL, _identityServerUrl, _clientId, _clientSecret, _scope);
-            var stockHistoryCollection = await stockApiClient.GetStockHistory(stockId);
+            var user = _AuthenticationService.GetUserIdentity();
+            var stockHistoryCollection = await stockApiClient.GetStockHistory(stockId, user.AccessToken);
 
             //create a dataseries for the chart
             DataSeries ds = new DataSeries();

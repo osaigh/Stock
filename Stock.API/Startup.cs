@@ -43,25 +43,36 @@ namespace Stock.API
             //Database
             string connectionString = _Configuration.GetConnectionString("DefaultConnection");
 
-            //services.AddAuthentication("Bearer")
-            //        .AddJwtBearer("Bearer",
-            //                      config =>
-            //                      {
-            //                          config.Authority = "https://localhost:44376/";
-            //                          config.Audience = "StockAPI";
-            //                      });
+            string identityServerUrl = _Configuration.GetValue(typeof(string), "IdentityServerUrl").ToString();
+            string apiScope = _Configuration.GetValue(typeof(string), "APIScope").ToString();
 
-            //services.AddAuthorization(options =>
-            //                          {
-            //                              options.AddPolicy("StockAPIPolicy",
-            //                                                policy =>
-            //                                                {
-            //                                                    policy.AuthenticationSchemes.Add("Bearer");
-            //                                                    policy.RequireScope("StockAPI");
-            //                                                });
+            //To run Stock.API.Test comeent out lines 47 - 64 and comment out the Authorization headers on the controllers
+            services.AddAuthentication(options => options.DefaultScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer("Bearer",
+                                  config =>
+                                  {
+                                      config.Authority = identityServerUrl;
+                                      config.Audience = apiScope;
+                                      config.RequireHttpsMetadata = false;
+                                      config.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                                      {
+                                          ValidateAudience = false,
 
-            //                          });
+                                      };
+                                  });
 
+            services.AddAuthorization(options =>
+                                      {
+                                          options.AddPolicy("StockAPIPolicy",
+                                                            policy =>
+                                                            {
+                                                                policy.AuthenticationSchemes.Add("Bearer");
+                                                                policy.AddRequirements(new Stock.API.Authorization.StockAPIRequirement(apiScope));
+                                                            });
+
+                                      });
+
+            services.AddScoped<IAuthorizationHandler, Stock.API.Authorization.StockAPIRequirementHandler>();
             services.AddCors(config =>
                              {
                                  config.AddPolicy("AllowAll",
@@ -136,15 +147,15 @@ namespace Stock.API
                                                      });
                                     });
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseCors("AllowAll");
 
             app.UseRouting();
 
-            //app.UseAuthentication();
+            app.UseAuthentication();
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

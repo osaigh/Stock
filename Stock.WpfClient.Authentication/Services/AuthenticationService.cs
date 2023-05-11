@@ -210,11 +210,20 @@ namespace Stock.WpfClient.Authentication.Services
         }
 
         /// <summary>
+        /// Get User Identity
+        /// </summary>
+        /// <returns>User</returns>
+        public User GetUserIdentity()
+        {
+            return _user;
+        }
+
+        /// <summary>
         /// Gets an HttpListener
         /// </summary>
         /// <param name="redirectUri"></param>
         /// <returns></returns>
-        public HttpListener GetHttpListener(string redirectUri)
+        private HttpListener GetHttpListener(string redirectUri)
         {
             var http = new HttpListener();
             http.Prefixes.Add(redirectUri);
@@ -227,7 +236,7 @@ namespace Stock.WpfClient.Authentication.Services
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public static string GetRequestData(HttpListenerRequest request)
+        private static string GetRequestData(HttpListenerRequest request)
         {
             //if (!request.HasEntityBody)
             //{

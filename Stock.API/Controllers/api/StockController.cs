@@ -13,7 +13,7 @@ using DTOStock = Stock.Models.Stock;
 
 namespace Stock.API.Controllers.api
 {
-    //[Authorize("StockAPIPolicy")]
+    [Authorize("StockAPIPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class StockController : ControllerBase

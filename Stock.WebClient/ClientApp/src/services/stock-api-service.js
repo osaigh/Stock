@@ -7,8 +7,17 @@ export default class StockApiService {
     this.baseURL = _baseURL;
   }
 
-  getAllStocks = () => {
-    return axios.get(this.baseURL + "stock");
+  getAllStocks = (accessToken = "") => {
+
+      if (accessToken.length > 0) {
+          const config = {
+              headers: { Authorization: `Bearer ${accessToken}` }
+          };
+          return axios.get(this.baseURL + "stock", config);
+      } else {
+          return axios.get(this.baseURL + "stock");
+      }
+    
   };
 
   create = (newObject) => {
@@ -19,7 +28,15 @@ export default class StockApiService {
     return axios.put(`${this.baseURL}/${id}`, newObject);
   };
 
-  getStockHistory = (stockId) => {
-    return axios.get(this.baseURL + "stockHistory/" + stockId);
+    getStockHistory = (stockId, accessToken = "") => {
+        if (accessToken.length > 0) {
+            const config = {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            };
+            return axios.get(this.baseURL + "stockHistory/" + stockId, config);
+        } else {
+            return axios.get(this.baseURL + "stockHistory/" + stockId);
+        }
+    
   };
 }

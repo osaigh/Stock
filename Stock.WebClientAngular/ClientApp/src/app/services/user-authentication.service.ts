@@ -65,6 +65,12 @@ export class UserAuthenticationService {
     return user;
   };
 
+  getUserIdentity = async () => {
+    const user = await this.UserManager.getUser();
+    //this.currentuser = user;
+    return user;
+  };
+
   signinRedirectCallback = async () => {
     await this.UserManager.signinRedirectCallback();
   };

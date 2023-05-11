@@ -8,9 +8,9 @@ namespace Stock.APIClient.API
 {
     public partial class StockAPIClient
     {
-        public async Task<IEnumerable<DTOStock>> GetStocks()
+        public async Task<IEnumerable<DTOStock>> GetStocks(string accessToken = null)
         {
-            var stockData = await this.FetchAsync<IEnumerable<DTOStock>>("Stock");
+            var stockData = await this.FetchAsync<IEnumerable<DTOStock>>("Stock", accessToken);
 
             return stockData;
         }

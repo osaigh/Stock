@@ -90,7 +90,7 @@ namespace Stock.IdentityServer
                                          })*/
                     //.AddSigningCredential(cert)
                     .AddInMemoryApiScopes(Configuration.GetApiScopes())
-                    .AddInMemoryApiResources(Configuration.GetApiResources())
+                    //.AddInMemoryApiResources(Configuration.GetApiResources())
                     .AddInMemoryIdentityResources(Configuration.GetIdentityResources())
                     .AddInMemoryClients(Configuration.GetClients())
                     .AddDeveloperSigningCredential();

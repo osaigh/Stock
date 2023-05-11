@@ -17,7 +17,7 @@ using DTOStockHistory = Stock.Models.StockHistory;
 
 namespace Stock.API.Controllers.api
 {
-    //[Authorize("StockAPIPolicy")]
+    [Authorize("StockAPIPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class StockHistoryController : ControllerBase

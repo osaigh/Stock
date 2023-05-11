@@ -44,7 +44,7 @@ export default function Home(){
             <Sidebar/>
             <div className={contentClassList} >
                 <Navbar/>
-                <div class="content">
+                <div className="content">
 
                 {(user)? <StockContainer />: <div style={{marginLeft:"auto",marginRight:"auto",
                 display:"flex", alignItems:"center", justifyContent:"center", height:"300px"}}><h6>Please Sign In</h6></div>}
