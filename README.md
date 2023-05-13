@@ -4,17 +4,17 @@ Stocks
 
 ## Description
 
-A project demonstrating various web technologies and techniques. This is a Stock application comprised of Identity Server for authentication, a React-based web client and a web-api.
+A project demonstrating various web technologies and techniques. This is an application that imitates a Stock reporting app.The foundational piece is a web API implemented with .NET 6.0. It leverages Identify Server 4 for security and authentication and is comprised of three client applications: React Client App, Angular Client and Windows Presentation Foundation (WPF) app. For the WPF app, I used Prism library to implement a modular structure and adopt standards such as MVVM and Unity Container.
 
 ## List of projects
 
 ### Stock.IdentityServer
 
-* An ASP.Net Core server for authentication using Identity Server 4. Protects the API resources defined
+* A .NET 6.0 server for authentication using Identity Server 4. Secures the API resources
 
 ### Stock.API
 
-* An ASP.Net Core Web API project. Contains all stock data 
+* A .NET 6.0 Web API project. Contains all the endpoints for stock information
 
 ### Stock.API.Client
 
@@ -26,20 +26,35 @@ A project demonstrating various web technologies and techniques. This is a Stock
 
 ### Stock.Models
 
-* A project that contains all the models 
+* A project that contains all the models related to Stocks
 
 ### Stock.WebClient
 
-* A react based web client that authenticates the user using the Stock.IdentityServer and retrieves data from the Stock.API
+* A React based web client that authenticates the user using the Stock.IdentityServer and retrieves data from Stock.API using access tokens received from the identity server
 
 ### Stock.WebClientAngular
 
-* An Angular based web client that authenticates the user using the Stock.IdentityServer and retrieves data from the Stock.API
+* An Angular based web client that authenticates the user using the Stock.IdentityServer and retrieves data from the Stock.API using access tokens feceived from the identity server
 
 ### Stock.MarketUpdater
 
-* A c# console application that periodically updates the Stocks data.
+* A c# console application that mimics periodic updates to the Stock data.
 
+### Stock.WpfClient.Common
+
+* A WPF class library project that contains all the common classes, interfaces and models used in the WPF Client app
+
+### Stock.WpfClient.Authentication
+
+* A WPF class library project implemented as a Prism module. This module is responsible for authentication in the WPF Client app
+
+### Stock.WpfClient.Surveillance
+
+* A WPF class library project implemented as a Prism module. This module is responsible for the charts and stock reports
+
+### Stock.WpfClient.Desktop
+
+* A WPF Application that leverages Prism to load Stock.WpfClient.Surveillance and Stock.WpfClient.Authentication modules
 
 ## How to Run
 
@@ -51,6 +66,8 @@ Debug the following projects.
 * Stock.IdentityServer
 * Stock.API
 * Stock.MarketUpdater
-* Stock.WebClientAngular or Stock.WebClient
+* Stock.WebClientAngular or Stock.WebClient or Stock.WpfClient.Desktop.
+
+*Alternatively, you can debug each project from the list above one by one.
 
 
