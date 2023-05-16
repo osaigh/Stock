@@ -58,7 +58,7 @@ A project demonstrating various web technologies and techniques. This is an appl
 
 ## How to Run
 
-Debug the following projects. 
+Ensure that you have .NET Framework(min 4.7.2), .NET 6.0 and Node js. Debug the following projects. 
 *Test user account : username->'bob' password->'password'
 *
 * Right-click on the solution file in visual studio. Select 'Properties' and select 'Multiple startup projects'
