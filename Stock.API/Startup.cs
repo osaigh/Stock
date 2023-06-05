@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Stock.API.Data;
 using Stock.API.Repository;
 using Stock.API.Models;
@@ -104,6 +105,12 @@ namespace Stock.API
             IMapper mapper = mappingConfiguration.CreateMapper();
             services.AddSingleton(mapper);
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "StockAPI", Version = "v1" });
+            });
+
+
             //StockMarketService
             services.AddScoped<IStockMarketService, StockMarketService>();
 
@@ -123,6 +130,13 @@ namespace Stock.API
                 //app.UseDeveloperExceptionPage();
                 SeedData.InitializeDB(stockDbContext);
             }
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "StockAPI v1");
+            });
 
             app.UseExceptionHandler(appError =>
                                     {

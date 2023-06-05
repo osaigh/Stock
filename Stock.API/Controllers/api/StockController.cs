@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -36,21 +37,24 @@ namespace Stock.API.Controllers.api
 
         #region Methods
         [HttpGet]
-        public async Task<IEnumerable<DTOStock>> Get()
+        [ProducesResponseType(typeof(IEnumerable<DTOStock>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<DTOStock>>> Get()
         {
             var daoStocks = await _StockRepository.GetAllAsync();
             
             var dtoStocks = _Mapper.Map<List<DTOStock>>(daoStocks);
 
-            return dtoStocks;
+            return Ok(dtoStocks);
         }
 
         [HttpGet("{id}")]
-        public async Task<DTOStock> Get(int id)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DTOStock), (int)(HttpStatusCode.OK))]
+        public async Task<ActionResult<DTOStock>> Get(int id)
         {
             if (id <= 0)
-            { 
-                return null;
+            {
+                return new BadRequestObjectResult("id is null");
             }
 
             var daoStock = await _StockRepository.GetAsync(id);
@@ -62,7 +66,7 @@ namespace Stock.API.Controllers.api
 
             var dtoStock= _Mapper.Map<DTOStock>(daoStock);
 
-            return dtoStock;
+            return Ok(dtoStock);
         }
 
         #endregion

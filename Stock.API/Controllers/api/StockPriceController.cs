@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -37,41 +38,47 @@ namespace Stock.API.Controllers.api
 
         #region Methods
         [HttpGet]
-        public async Task<IEnumerable<DTOStockPrice>> Get()
+        [ProducesResponseType(typeof(IEnumerable<DTOStockPrice>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<DTOStockPrice>>> Get()
         {
             var daoStockPrices = await _StockPriceRepository.GetAllAsync();
             var dtoStockPrices = _Mapper.Map<List<DTOStockPrice>>(daoStockPrices);
 
-            return dtoStockPrices;
+            return Ok(dtoStockPrices);
         }
 
         [HttpGet("{id}")]
-        public async Task<DTOStockPrice> Get(int id)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DTOStockPrice), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<DTOStockPrice>> Get(int id)
         {
             var daoStockPrice = await _StockPriceRepository.GetAsync(id);
 
             if (daoStockPrice == null)
             {
-                return null;
+                return new BadRequestObjectResult(string.Format("No StockPrice with id {0}", id));
             }
 
             var dtoStockPrice = _Mapper.Map<DTOStockPrice>(daoStockPrice);
 
-            return dtoStockPrice;
+            return Ok(dtoStockPrice);
         }
 
         [HttpPost]
-        public async Task<DTOStockPrice> Post([FromBody] ApiRequest apiRequest)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(DTOStockPrice), (int)(HttpStatusCode.OK))]
+        public async Task<ActionResult<DTOStockPrice>> Post([FromBody] ApiRequest apiRequest)
         {
             if (string.IsNullOrEmpty(apiRequest.JsonString))
             {
-                return null;
+                return new BadRequestObjectResult("JsonString is empty");
             }
 
             DTOStockPrice dtoStockPrice = JsonConvert.DeserializeObject<DTOStockPrice>(apiRequest.JsonString);
             if (dtoStockPrice == null || dtoStockPrice.StockId <= 0)
             {
-                return null;
+                return new BadRequestObjectResult("StockId is invalid");
             }
 
             var daoStockPrice = _Mapper.Map<DAOStockPrice>(dtoStockPrice);
@@ -79,33 +86,36 @@ namespace Stock.API.Controllers.api
 
             if (daoStockPrice == null)
             {
-                return null;
+                return NotFound();
             }
 
             dtoStockPrice = _Mapper.Map<DTOStockPrice>(daoStockPrice);
 
-            return dtoStockPrice;
+            return Ok(dtoStockPrice);
         }
 
         [HttpPut]
-        public async Task<DTOStockPrice> Put([FromBody] ApiRequest apiRequest)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(DTOStockPrice), (int)(HttpStatusCode.OK))]
+        public async Task<ActionResult<DTOStockPrice>> Put([FromBody] ApiRequest apiRequest)
         {
             if (string.IsNullOrEmpty(apiRequest.JsonString))
             {
-                return null;
+                return new BadRequestObjectResult("JsonString is empty");
             }
 
             DTOStockPrice dtoStockPrice = JsonConvert.DeserializeObject<DTOStockPrice>(apiRequest.JsonString);
             if (dtoStockPrice == null || dtoStockPrice.Id <= 0
                                                || dtoStockPrice.StockId <= 0)
             {
-                return null;
+                return new BadRequestObjectResult("StockId is invalid");
             }
 
             var daoStockPrice = await _StockPriceRepository.GetAsync(dtoStockPrice.Id);
             if (daoStockPrice == null)
             {
-                return null;
+                return new BadRequestObjectResult("No StockPrice");
             }
 
             _Mapper.Map(dtoStockPrice, daoStockPrice);
@@ -113,12 +123,12 @@ namespace Stock.API.Controllers.api
             daoStockPrice = await _StockPriceRepository.UpdateAsync(daoStockPrice);
             if (daoStockPrice == null)
             {
-                return null;
+                return NotFound();
             }
 
             dtoStockPrice = _Mapper.Map<DTOStockPrice>(daoStockPrice);
 
-            return dtoStockPrice;
+            return Ok(dtoStockPrice);
         }
         #endregion
     }

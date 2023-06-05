@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -40,21 +41,24 @@ namespace Stock.API.Controllers.api
 
         #region Methods
         [HttpGet]
-        public async Task<IEnumerable<DTOStockHistory>> Get()
+        [ProducesResponseType(typeof(IEnumerable<DTOStockHistory>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<DTOStockHistory>>> Get()
         {
             var daoStockHistories = await _StockHistoryRepository.GetAllAsync();
 
             var dtoStockHistories = _Mapper.Map<List<DTOStockHistory>>(daoStockHistories);
 
-            return dtoStockHistories;
+            return Ok(dtoStockHistories);
         }
 
         [HttpGet("{stockId}")]
-        public async Task<IEnumerable<DTOStockHistory>> Get(int stockId)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(IEnumerable<DTOStockHistory>), (int)(HttpStatusCode.OK))]
+        public async Task<ActionResult<IEnumerable<DTOStockHistory>>> Get(int stockId)
         {
             if (stockId <= 0)
             {
-                return null;
+                return new BadRequestObjectResult("stockId is null");
             }
 
             var allStockHistories = await _StockHistoryRepository.GetAllAsync();
@@ -65,7 +69,7 @@ namespace Stock.API.Controllers.api
             daoStockHistories.Sort(stockHistoryComparer);
             var dtoStockHistories = _Mapper.Map<List<DTOStockHistory>>(daoStockHistories);
 
-            return dtoStockHistories;
+            return Ok(dtoStockHistories);
         }
 
         #endregion

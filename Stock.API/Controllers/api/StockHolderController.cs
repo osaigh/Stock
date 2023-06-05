@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -39,28 +40,31 @@ namespace Stock.API.Controllers.api
 
         #region Methods
         [HttpGet]
-        public async Task<IEnumerable<DTOStockHolder>> Get()
+        [ProducesResponseType(typeof(IEnumerable<DTOStockHolder>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<DTOStockHolder>>> Get()
         {
             var daoStockHolders = await _StockHolderRepository.GetAllAsync();
 
             var dtoStockHolders = _Mapper.Map<List<DTOStockHolder>>(daoStockHolders);
 
-            return dtoStockHolders;
+            return Ok(dtoStockHolders); ;
         }
 
         [HttpGet("{username}")]
-        public async Task<DTOStockHolder> Get(string username)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DTOStockHolder), (int)(HttpStatusCode.OK))]
+        public async Task<ActionResult<DTOStockHolder>> Get(string username)
         {
             if (string.IsNullOrEmpty(username))
             {
-                return null;
+                return new BadRequestObjectResult("username is null");
             }
 
             var daoStockHolder = await _StockHolderRepository.GetAsync(username);
 
             if (daoStockHolder == null)
             {
-                return null;
+                return new BadRequestObjectResult(string.Format("No Stockholder with username {0}", username));
             }
 
             var dtoStockHolder = _Mapper.Map<DTOStockHolder>(daoStockHolder);
@@ -69,11 +73,13 @@ namespace Stock.API.Controllers.api
         }
 
         [HttpPost]
-        public async Task<DTOStockHolder> Post([FromBody] ApiRequest apiRequest)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DTOStockHolder), (int)(HttpStatusCode.OK))]
+        public async Task<ActionResult<DTOStockHolder>> Post([FromBody] ApiRequest apiRequest)
         {
             if (string.IsNullOrEmpty(apiRequest.JsonString))
             {
-                return null;
+                return new BadRequestObjectResult("JsonString is empty");
             }
 
             DTOStockHolder dtoStockHolder = JsonConvert.DeserializeObject<DTOStockHolder>(apiRequest.JsonString);
@@ -81,7 +87,7 @@ namespace Stock.API.Controllers.api
             //validate input
             if (dtoStockHolder == null || string.IsNullOrEmpty(dtoStockHolder.Username))
             {
-                return null;
+                return new BadRequestObjectResult("Username is required");
             }
 
             //Add
@@ -90,34 +96,36 @@ namespace Stock.API.Controllers.api
             daoStockHolder = await _StockHolderRepository.AddAsync(daoStockHolder);
             if (daoStockHolder == null)
             {
-                return null;
+                return new BadRequestObjectResult(string.Format("No Stockholder with username {0}", dtoStockHolder.Username));
             }
 
             dtoStockHolder = _Mapper.Map<DTOStockHolder>(daoStockHolder);
 
-            return dtoStockHolder;
+            return Ok(dtoStockHolder);
         }
 
         [HttpPut]
-        public async Task<DTOStockHolder> Put([FromBody] ApiRequest apiRequest)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DTOStockHolder), (int)(HttpStatusCode.OK))]
+        public async Task<ActionResult<DTOStockHolder>> Put([FromBody] ApiRequest apiRequest)
         {
             if (string.IsNullOrEmpty(apiRequest.JsonString))
             {
-                return null;
+                return new BadRequestObjectResult("JsonString is empty");
             }
 
             DTOStockHolder dtoStockHolder = JsonConvert.DeserializeObject<DTOStockHolder>(apiRequest.JsonString);
             //validate input
             if (dtoStockHolder == null || string.IsNullOrEmpty(dtoStockHolder.Username))
             {
-                return null;
+                return new BadRequestObjectResult("Username is required");
             }
 
             //Update
             var daoStockHolder = await _StockHolderRepository.GetAsync(dtoStockHolder.Username);
             if (daoStockHolder == null)
             {
-                return null;
+                return new BadRequestObjectResult(string.Format("No Stockholder with username {0}", dtoStockHolder.Username));
             }
 
             _Mapper.Map(dtoStockHolder, daoStockHolder);
@@ -125,12 +133,12 @@ namespace Stock.API.Controllers.api
 
             if (daoStockHolder == null)
             {
-                return null;
+                return new BadRequestObjectResult(string.Format("No Stockholder with username {0}", dtoStockHolder.Username));
             }
 
             dtoStockHolder = _Mapper.Map<DTOStockHolder>(daoStockHolder);
 
-            return dtoStockHolder;
+            return Ok(dtoStockHolder);
         }
         #endregion
     }
