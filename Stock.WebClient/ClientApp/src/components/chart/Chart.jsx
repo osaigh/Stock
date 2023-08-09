@@ -2,7 +2,7 @@ import React from 'react';
 import './chart.scss';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const toDollars = (decimal) => `${(decimal).toFixed(0)}$`;
+const toDollars = (decimal) => `$${(decimal).toFixed(0)}`;
 
 
 const Chart = ({ aspect, title, data }) => {
