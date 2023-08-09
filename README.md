@@ -6,7 +6,7 @@ Stock Trader
 
 ## Description
 
-A project demonstrating various web technologies and techniques. This is an application that imitates a Stock reporting app.The foundational piece is a web API implemented with .NET 6.0. It leverages Identify Server 4 for security and authentication and is comprised of three client applications: React Client App, Angular Client and Windows Presentation Foundation (WPF) app. For the WPF app, I used Prism library to implement a modular structure and adopt standards such as MVVM and Unity Container.
+This is a fictitious Stock Trading application.The foundational piece is a web API implemented with .NET 6.0. It leverages Identify Server 4 for security and authentication and is comprised of three client applications: React Client App, Angular Client and Windows Presentation Foundation (WPF) app. For the WPF app, I used Prism library to implement a modular structure and adopt standards such as MVVM and Unity Container.
 
 ## List of projects
 
