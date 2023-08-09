@@ -1,6 +1,8 @@
 # Project Title
 
-Stocks
+Stock Trader
+
+![alt text](https://github.com/osaigh/stocks/blob/main/images/Screenshot 2023-08-09 094305.png?raw=true)
 
 ## Description
 
