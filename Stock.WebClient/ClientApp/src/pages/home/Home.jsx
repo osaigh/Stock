@@ -9,6 +9,11 @@ import { onAppClicked } from "../../slices/sidebar-slice";
 import useWindowSize from '../../hooks/windowHook';
 import { UserAuthenticationContext } from "../../context/user-manager-context";
 import { StockContainer } from "../../components/stockcontainer/Stockcontainer";
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import {Typography } from '@mui/material';
+import Login from "../../components/login/Login";
+import { Navigate } from "react-router-dom";
 
 export default function Home(){
     const status = useSelector(state => state.sidebar.status);
@@ -29,6 +34,10 @@ export default function Home(){
       }, []);
 
 
+    const signIn = function () {
+        userAuthenticationService.signIn();
+    };
+
     const onClicked = (event) =>{
       if(windowSize.width < 767){
         dispatch(onAppClicked(new Date().getTime()));
@@ -39,8 +48,20 @@ export default function Home(){
     if(status == "hide"){
         contentClassList = classNames("homeContainer","maincontent","expand");
     }
+
+    console.log(user);
     return (
-        <div className='home'>
+      <>
+      {user ?
+        <Navigate to="/" />
+        :
+        <Login/>
+        }
+    </>
+    );
+}
+/* 
+<div className='home'>
             <Sidebar/>
             <div className={contentClassList} >
                 <Navbar/>
@@ -51,6 +72,4 @@ export default function Home(){
                 
                 </div>
             </div>
-        </div>
-    );
-}
+        </div> */

@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using DTOStock = Stock.Models.Stock;
+using DTOStockPosition = Stock.Models.StockPosition;
 //using Stock.APIClient.API;
 
 namespace Stock.WpfClient.Surveillance.ViewModels
@@ -103,11 +103,11 @@ namespace Stock.WpfClient.Surveillance.ViewModels
             set { SetProperty(ref this._isSignedIn, value); }
         }
 
-        private ObservableCollection<DTOStock> _stocks = new ObservableCollection<DTOStock>();
-        public ObservableCollection<DTOStock> Stocks
+        private ObservableCollection<DTOStockPosition> _stockPositions = new ObservableCollection<DTOStockPosition>();
+        public ObservableCollection<DTOStockPosition> StockPositions
         {
-            get { return _stocks; }
-            set { SetProperty(ref this._stocks, value); }
+            get { return _stockPositions; }
+            set { SetProperty(ref this._stockPositions, value); }
         }
 
         private Visibility signedInVisibility = Visibility.Visible;
@@ -130,8 +130,8 @@ namespace Stock.WpfClient.Surveillance.ViewModels
             }
         }
 
-        private DTOStock _selectedStock = null;
-        public DTOStock SelectedStock
+        private DTOStockPosition _selectedStock = null;
+        public DTOStockPosition SelectedStock
         {
             get { return _selectedStock; }
             set
@@ -182,8 +182,8 @@ namespace Stock.WpfClient.Surveillance.ViewModels
                         if (_keepRunning)
                         {
                             var user = _AuthenticationService.GetUserIdentity();
-                            var stocks = _stockApiClient.GetStocks(user.AccessToken).GetAwaiter().GetResult();
-                            Application.Current.Dispatcher.Invoke(_OnStockUpdateDelegate, stocks);
+                            var stockPositions = _stockApiClient.GetStockPositions(user.AccessToken).GetAwaiter().GetResult();
+                            Application.Current.Dispatcher.Invoke(_OnStockUpdateDelegate, stockPositions);
                         }
                         else
                         {
@@ -210,8 +210,8 @@ namespace Stock.WpfClient.Surveillance.ViewModels
             this.ChartVisibility = Visibility.Visible;
             
             //get the stock Id
-            int stockId = _selectedStock.Id;
-            string name = _selectedStock.Name;
+            string stockId = _selectedStock.StockId;
+            string name = _selectedStock.StockId;
             
             //call the api to get the stockhistory data
             var stockApiClient = new StockAPIClient(_baseURL, _identityServerUrl, _clientId, _clientSecret, _scope);
@@ -277,26 +277,26 @@ namespace Stock.WpfClient.Surveillance.ViewModels
         #endregion
 
         #region Delegates
-        protected delegate void OnStockUpdateDelegate(IEnumerable<DTOStock> stocks);
+        protected delegate void OnStockUpdateDelegate(IEnumerable<DTOStockPosition> stocks);
 
         protected OnStockUpdateDelegate _OnStockUpdateDelegate;
 
-        protected void OnStockUpdate(IEnumerable<DTOStock> stocks)
+        protected void OnStockUpdate(IEnumerable<DTOStockPosition> stockPositions)
         {
-            this.Stocks.Clear();
-            foreach (var stock in stocks)
+            this.StockPositions.Clear();
+            foreach (var stockPosition in stockPositions)
             {
-                var stockModel = new DTOStock()
+                var stockPositionModel = new DTOStockPosition()
                 {
-                    Id = stock.Id,
-                    Price = Math.Round(stock.Price),
-                    Volume = stock.Volume,
-                    Name = stock.Name,
+                    StockId = stockPosition.StockId,
+                    CurrentPrice = Math.Round(stockPosition.CurrentPrice,2),
+                    CostBasis = Math.Round(stockPosition.CostBasis, 2),
+                    Shares = stockPosition.Shares,
                 };
-                this.Stocks.Add(stockModel);
+                this.StockPositions.Add(stockPositionModel);
             }
             
-            this.OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("Stocks"));
+            this.OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("StockPositions"));
         }
         #endregion
     }

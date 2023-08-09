@@ -11,7 +11,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 export function StockContainer() {
   const [lineChartData, setLineChartData] = useState({ title: "", data: [] });
-    const [stocks, setStocks] = useState({user:null, stockData:[]});
+    const [stockPositions, setStockPositions] = useState({user:null, stockPositionData:[]});
   const { stockApiService } = useContext(StockApiContext);
   const { userAuthenticationService } = useContext(UserAuthenticationContext);
 
@@ -19,36 +19,36 @@ export function StockContainer() {
     const interval = setInterval(async () => {
       let _user =await userAuthenticationService.getUserIdentity();
       if(_user){
-          stockApiService.getAllStocks(_user.access_token).then((response) => {
+          stockApiService.getAllStockPositions(_user.access_token).then((response) => {
               console.log(response.data);
-              setStocks({ user: _user, stockData: response.data });
+              setStockPositions({ user: _user, stockPositionData: response.data });
           });
       }
       
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [stocks]);
+  }, [stockPositions]);
 
   var content = {};
 
   const getChartData = () => {
     var data = { labels: [], values: [] };
 
-    stocks.stockData.forEach((stock) => {
-      data.labels.push(stock.name);
+    stockPositions.stockPositionData.forEach((stock) => {
+      data.labels.push(stock.stockId);
       data.values.push(stock.volume);
     });
   };
 
   const viewHistory = (stockId) => {
-    if (stocks.user == null) {
+    if (stockPositions.user == null) {
       return;
      }
 
     var stock = null;
-    stocks.stockData.forEach((st) => {
-      if (st.id == stockId) {
+    stockPositions.stockPositionData.forEach((st) => {
+      if (st.stockId == stockId) {
         stock = st;
       }
     });
@@ -57,27 +57,30 @@ export function StockContainer() {
       return;
     }
 
-    stockApiService.getStockHistory(stockId,stocks.user.access_token).then((response) => {
+    stockApiService.getStockHistory(stockId,stockPositions.user.access_token).then((response) => {
       var stockHistoryCollection = response.data;
       var newLineChartData = {
-        title: stock.name,
+        title: stock.stockId,
         data: stockHistoryCollection,
       };
       setLineChartData(newLineChartData);
     });
   };
 
-  var tableData = stocks.stockData.map((stock, index) => (
+  var tableData = stockPositions.stockPositionData.map((stock, index) => (
     <tr key={index + 1}>
       <td>{index + 1}</td>
-      <td>{stock.name}</td>
-      <td>${Math.round(stock.price)}</td>
-      <td>{stock.volume}</td>
+      <td>{stock.stockId}</td>
+      <td>{stock.shares}</td>
+      <td>${Math.round(stock.currentPrice * 100)/100}</td>
+      <td>${Math.round(stock.costBasis * 100)/100}</td>
+      <td>${Math.round(stock.marketValue * 100)/100}</td>
+      <td>{Math.round(stock.gainLossPercent * 100)/100}</td>
       <td>
         <Button
           className="btn primary"
           onClick={() => {
-            viewHistory(stock.id);
+            viewHistory(stock.stockId);
           }}
         >
           View History
@@ -86,7 +89,7 @@ export function StockContainer() {
     </tr>
   ));
 
-  var legendItems = stocks.stockData.map((stock, index) => (
+  var legendItems = stockPositions.stockPositionData.map((stock, index) => (
     <span>
       <i key={index} className="fas fa-circle text-info"></i>
       {stock.name}
@@ -159,9 +162,12 @@ export function StockContainer() {
                                     <thead>
                                         <tr>
                                             <th className="border-0">ID</th>
-                                            <th className="border-0">Name</th>
-                                            <th className="border-0">Price</th>
-                                            <th className="border-0">Volume</th>
+                                            <th className="border-0">Stock</th>
+                                            <th className="border-0">Shares</th>
+                                            <th className="border-0">Last</th>
+                                            <th className="border-0">Cost Basis</th>
+                                            <th className="border-0">Market Value</th>
+                                            <th className="border-0">Gain/Loss %</th>
                                             <th className="border-0"></th>
                                         </tr>
                                     </thead>

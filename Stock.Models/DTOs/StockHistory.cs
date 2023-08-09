@@ -6,9 +6,9 @@ namespace Stock.Models
 {
     public class StockHistory
     {
-        public int Id { get; set; }
+        public int StockHistoryId { get; set; }
         public DateTimeOffset Date { get; set; }
         public double Price { get; set; }
-        public int StockId { get; set; }
+        public string StockId { get; set; }
     }
 }

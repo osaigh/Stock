@@ -20,15 +20,56 @@ export default class StockApiService {
     
   };
 
-  create = (newObject) => {
+  getAllStockPositions = (accessToken = "") => {
+
+    if (accessToken.length > 0) {
+        const config = {
+            headers: { Authorization: `Bearer ${accessToken}` }
+        };
+        return axios.get(this.baseURL + "StockPosition", config);
+    } else {
+        return axios.get(this.baseURL + "StockPosition");
+    }
+  
+};
+
+    getAllStockOrders = (accessToken = "") => {
+
+    if (accessToken.length > 0) {
+        const config = {
+            headers: { Authorization: `Bearer ${accessToken}` }
+        };
+        return axios.get(this.baseURL + "StockOrder", config);
+    } else {
+        return axios.get(this.baseURL + "StockOrder");
+    }
+  
+};
+
+  createStockOrder = (accessToken = "", stockOrder) =>{
+    if (accessToken.length > 0) {
+        const config = {
+            headers: { 
+                Authorization: `Bearer ${accessToken}`, 
+                'Accept': 'application/json',
+                'Content-Type': 'application/json' 
+            }
+        };
+        return axios.post(this.baseURL + "StockOrder", stockOrder, config);
+    } else {
+        return axios.post(this.baseURL + "StockOrder", stockOrder);
+    }
+  }
+
+  createStock = (newObject) => {
     return axios.post(this.baseURL, newObject);
   };
 
-  update = (id, newObject) => {
+  updateStock = (id, newObject) => {
     return axios.put(`${this.baseURL}/${id}`, newObject);
   };
 
-    getStockHistory = (stockId, accessToken = "") => {
+  getStockHistory = (stockId, accessToken = "") => {
         if (accessToken.length > 0) {
             const config = {
                 headers: { Authorization: `Bearer ${accessToken}` }

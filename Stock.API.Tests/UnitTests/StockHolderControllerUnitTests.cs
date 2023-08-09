@@ -112,7 +112,7 @@ namespace Stock.API.Tests.UnitTests
             var mapper = GetMapper();
 
             var stockHoldersCollection = Utilities.GetTestStockHolders();
-            var jimmyStockHolder = new DTOs.StockHolder()
+            var jimmyStockHolder = new DTOs.StockOrder()
                                    {
                                        Username = "Jimmy", Email = "jimmy@zend.com",
                                    };
@@ -164,7 +164,7 @@ namespace Stock.API.Tests.UnitTests
             var mapper = GetMapper();
 
             var stockHoldersCollection = Utilities.GetTestStockHolders();
-            var abrahamStockHolder = new DTOs.StockHolder()
+            var abrahamStockHolder = new DTOs.StockOrder()
             {
                 Username = "Abraham",
                 Email = "abraham@zend.com",
@@ -204,7 +204,7 @@ namespace Stock.API.Tests.UnitTests
             var mapper = GetMapper();
 
             var stockHoldersCollection = Utilities.GetTestStockHolders();
-            var abrahamStockHolder = new DTOs.StockHolder()
+            var abrahamStockHolder = new DTOs.StockOrder()
                                      {
                                          Username = "Abraham",
                                          Email = "abraham@zend.com",
@@ -241,7 +241,7 @@ namespace Stock.API.Tests.UnitTests
             var mapper = GetMapper();
 
             var stockHoldersCollection = Utilities.GetTestStockHolders();
-            var abrahamStockHolder = new DTOs.StockHolder()
+            var abrahamStockHolder = new DTOs.StockOrder()
                                      {
                                          Username = string.Empty,
                                          Email = "abraham@zend.com",
@@ -280,9 +280,9 @@ namespace Stock.API.Tests.UnitTests
         {
             //AutoMapper
             var mockMapper = new Mock<IMapper>();
-            mockMapper.Setup(mapper => mapper.Map<DTOs.StockHolder>(It.IsAny<DAOs.StockHolder>())).Returns((DAOs.StockHolder inputStockHolder) =>
+            mockMapper.Setup(mapper => mapper.Map<DTOs.StockOrder>(It.IsAny<DAOs.StockHolder>())).Returns((DAOs.StockHolder inputStockHolder) =>
             {
-                var dtoStockHolder = new DTOs.StockHolder
+                var dtoStockHolder = new DTOs.StockOrder
                 {
                     Username = inputStockHolder.Username,
                     Email = inputStockHolder.Email,
@@ -291,9 +291,9 @@ namespace Stock.API.Tests.UnitTests
                 return dtoStockHolder;
             });
 
-            mockMapper.Setup(mapper => mapper.Map<List<DTOs.StockHolder>>(It.IsAny<List<DAOs.StockHolder>>())).Returns((List<DAOs.StockHolder> inputStockHolders) =>
+            mockMapper.Setup(mapper => mapper.Map<List<DTOs.StockOrder>>(It.IsAny<List<DAOs.StockHolder>>())).Returns((List<DAOs.StockHolder> inputStockHolders) =>
             {
-                return inputStockHolders.Select(inputStockHolder => new DTOs.StockHolder()
+                return inputStockHolders.Select(inputStockHolder => new DTOs.StockOrder()
                 {
                     Username = inputStockHolder.Username,
                     Email = inputStockHolder.Email,
@@ -301,7 +301,7 @@ namespace Stock.API.Tests.UnitTests
                                         .ToList();
             });
 
-            mockMapper.Setup(mapper => mapper.Map<DAOs.StockHolder>(It.IsAny<DTOs.StockHolder>())).Returns((DTOs.StockHolder inputStockHolder) =>
+            mockMapper.Setup(mapper => mapper.Map<DAOs.StockHolder>(It.IsAny<DTOs.StockOrder>())).Returns((DTOs.StockOrder inputStockHolder) =>
             {
                 var dtoStockHolder = new DAOs.StockHolder
                 {
@@ -312,7 +312,7 @@ namespace Stock.API.Tests.UnitTests
                 return dtoStockHolder;
             });
 
-            mockMapper.Setup(mapper => mapper.Map<List<DAOs.StockHolder>>(It.IsAny<List<DTOs.StockHolder>>())).Returns((List<DTOs.StockHolder> inputStockHolders) =>
+            mockMapper.Setup(mapper => mapper.Map<List<DAOs.StockHolder>>(It.IsAny<List<DTOs.StockOrder>>())).Returns((List<DTOs.StockOrder> inputStockHolders) =>
             {
                 return inputStockHolders.Select(inputStockHolder => new DAOs.StockHolder()
                 {
@@ -322,8 +322,8 @@ namespace Stock.API.Tests.UnitTests
                                         .ToList();
             });
 
-            mockMapper.Setup(mapper => mapper.Map(It.IsAny<DTOs.StockHolder>(), It.IsAny<DAOs.StockHolder>()))
-                      .Returns((DTOs.StockHolder dtoStockHolder, DAOs.StockHolder daoStockHolder) =>
+            mockMapper.Setup(mapper => mapper.Map(It.IsAny<DTOs.StockOrder>(), It.IsAny<DAOs.StockHolder>()))
+                      .Returns((DTOs.StockOrder dtoStockHolder, DAOs.StockHolder daoStockHolder) =>
                                {
                                    daoStockHolder.Email = dtoStockHolder.Email;
                                    daoStockHolder.Username = dtoStockHolder.Username;

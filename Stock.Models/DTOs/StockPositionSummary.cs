@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Stock.Models
 {
-    public class StockPrice
+    public class StockPositionSummary
     {
         public int Id { get; set; }
         public double Price { get; set; }

@@ -34,7 +34,7 @@ namespace Stock.API.Repository
         public async Task<StockHistory> AddAsync(StockHistory stockHistory)
         {
             //check to see if the Stock exist
-            Models.Stock _stock = await _StockDbContext.Stocks.FirstOrDefaultAsync(s => s.Id == stockHistory.StockId);
+            Models.Stock _stock = await _StockDbContext.Stocks.FirstOrDefaultAsync(s => s.StockId == stockHistory.StockId);
 
             //If the stock does not exist, return null
             if (_stock == null)
@@ -51,7 +51,7 @@ namespace Stock.API.Repository
 
         public async Task DeleteAsync(StockHistory stockHistory)
         {
-            var _stockHistory = await GetAsync(stockHistory.Id);
+            var _stockHistory = await GetAsync(stockHistory.StockHistoryId);
 
             if (_stockHistory != null)
             {
@@ -81,12 +81,12 @@ namespace Stock.API.Repository
             int key = int.Parse(id.ToString());
             return await _StockDbContext.StockHistories
                                         //.Include(s => s.Stock)
-                                        .FirstOrDefaultAsync(s => s.Id == key);
+                                        .FirstOrDefaultAsync(s => s.StockHistoryId == key);
         }
 
         public async Task<StockHistory> UpdateAsync(StockHistory stockHistory)
         {
-            var _stockHistory = await GetAsync(stockHistory.Id);
+            var _stockHistory = await GetAsync(stockHistory.StockHistoryId);
 
             if (_stockHistory == null)
             {

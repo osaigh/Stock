@@ -20,23 +20,32 @@
         <Border Margin="0,0,10,0" BorderBrush="LightGray" BorderThickness="1">
             <ListView BorderThickness="0" Width="Auto"
                   
-                  ItemsSource="{Binding Path=Stocks}"  HorizontalContentAlignment="Stretch"
+                  ItemsSource="{Binding Path=StockPositions}"  HorizontalContentAlignment="Stretch"
                   SelectedItem="{Binding Path=SelectedStock, Mode=TwoWay}"  AlternationCount="2"
                   IsSynchronizedWithCurrentItem="True" AutomationProperties.AutomationId="StockGrid" Foreground="#FF121723" d:ItemsSource="{d:SampleData ItemCount=5}">
                 <ListView.View>
                     <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Current positions"
                           >
-                        <GridViewColumn Header="Id" 
+                        <!--<GridViewColumn Header="Id" 
                   DisplayMemberBinding="{Binding Path=Id}" 
-                   Width="85"/>
+                   Width="85"/>-->
                         <GridViewColumn Header="Name"  
-                  DisplayMemberBinding="{Binding Path=Name}"
+                  DisplayMemberBinding="{Binding Path=StockId}"
                   Width="85" />
-                        <GridViewColumn Header="Price"  
-                  DisplayMemberBinding="{Binding Converter={StaticResource currencyConverter}, Path=Price}"
+                        <GridViewColumn Header="Shares"  
+                  DisplayMemberBinding="{Binding Path=Shares}"
                   Width="85" />
-                        <GridViewColumn Header="Cost Volume"  
-                  DisplayMemberBinding="{Binding Path=Volume}"
+                        <GridViewColumn Header="Last"  
+                  DisplayMemberBinding="{Binding Converter={StaticResource currencyConverter}, Path=CurrentPrice}"
+                  Width="85" />
+                        <GridViewColumn Header="Cost Basis"  
+                  DisplayMemberBinding="{Binding Converter={StaticResource currencyConverter}, Path=CostBasis}"
+                  Width="85" />
+                        <GridViewColumn Header="Market Value"  
+                  DisplayMemberBinding="{Binding Converter={StaticResource currencyConverter}, Path=MarketValue}"
+                  Width="85" />
+                        <GridViewColumn Header="Gain/Loss %"  
+                  DisplayMemberBinding="{Binding Path=GainLossPercent}"
                   Width="85" />
 
                     </GridView>

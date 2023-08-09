@@ -97,7 +97,7 @@ namespace Stock.API.Tests.UnitTests
                 shp.Id = index;
                 index++;
             }
-            var _stockHolderPosition = new DTOs.StockHolderPosition()
+            var _stockHolderPosition = new DTOs.StockPosition()
             {
                 StockHolderId = "Jimmy",
                 Shares = 30,
@@ -136,7 +136,7 @@ namespace Stock.API.Tests.UnitTests
             //AutoMapper
             var mapper = GetMapper();
             var stockHolderPositions = Utilities.GetTestStockHolderPositions();
-            var gabeStockHolderPosition = new DTOs.StockHolderPosition()
+            var gabeStockHolderPosition = new DTOs.StockPosition()
                                           {
                                               StockHolderId =String.Empty,
                                               Shares = 30,
@@ -171,9 +171,9 @@ namespace Stock.API.Tests.UnitTests
         {
             //AutoMapper
             var mockMapper = new Mock<IMapper>();
-            mockMapper.Setup(mapper => mapper.Map<DTOs.StockHolderPosition>(It.IsAny<DAOs.StockHolderPosition>())).Returns((DAOs.StockHolderPosition inputStockHolderPosition) =>
+            mockMapper.Setup(mapper => mapper.Map<DTOs.StockPosition>(It.IsAny<DAOs.StockHolderPosition>())).Returns((DAOs.StockHolderPosition inputStockHolderPosition) =>
                                                                                                                            {
-                                                                                                                               var dtoStockHolderPosition = new DTOs.StockHolderPosition
+                                                                                                                               var dtoStockHolderPosition = new DTOs.StockPosition
                                                                                                                                                             {
                                                                                                                                                                 StockHolderId = inputStockHolderPosition.StockHolderId,
                                                                                                                                                                 Id = inputStockHolderPosition.Id,
@@ -185,9 +185,9 @@ namespace Stock.API.Tests.UnitTests
                                                                                                                                return dtoStockHolderPosition;
                                                                                                                            });
 
-            mockMapper.Setup(mapper => mapper.Map<List<DTOs.StockHolderPosition>>(It.IsAny<List<DAOs.StockHolderPosition>>())).Returns((List<DAOs.StockHolderPosition> inputStockHolderPositions) =>
+            mockMapper.Setup(mapper => mapper.Map<List<DTOs.StockPosition>>(It.IsAny<List<DAOs.StockHolderPosition>>())).Returns((List<DAOs.StockHolderPosition> inputStockHolderPositions) =>
                                                                                                                                        {
-                                                                                                                                           return inputStockHolderPositions.Select(inputStockHolderPosition => new DTOs.StockHolderPosition()
+                                                                                                                                           return inputStockHolderPositions.Select(inputStockHolderPosition => new DTOs.StockPosition()
                                                                                                                                                                                                {
                                                                                                                                                                                                    StockHolderId = inputStockHolderPosition.StockHolderId,
                                                                                                                                                                                                    Id = inputStockHolderPosition.Id,
@@ -198,7 +198,7 @@ namespace Stock.API.Tests.UnitTests
                                                                                                                                                                    .ToList();
                                                                                                                                        });
 
-            mockMapper.Setup(mapper => mapper.Map<DAOs.StockHolderPosition>(It.IsAny<DTOs.StockHolderPosition>())).Returns((DTOs.StockHolderPosition inputStockHolderPosition) =>
+            mockMapper.Setup(mapper => mapper.Map<DAOs.StockHolderPosition>(It.IsAny<DTOs.StockPosition>())).Returns((DTOs.StockPosition inputStockHolderPosition) =>
             {
                 var daoStockHolderPosition = new DAOs.StockHolderPosition
                 {
@@ -212,7 +212,7 @@ namespace Stock.API.Tests.UnitTests
                 return daoStockHolderPosition;
             });
 
-            mockMapper.Setup(mapper => mapper.Map<List<DAOs.StockHolderPosition>>(It.IsAny<List<DTOs.StockHolderPosition>>())).Returns((List<DTOs.StockHolderPosition> inputStockHolderPositions) =>
+            mockMapper.Setup(mapper => mapper.Map<List<DAOs.StockHolderPosition>>(It.IsAny<List<DTOs.StockPosition>>())).Returns((List<DTOs.StockPosition> inputStockHolderPositions) =>
             {
                 return inputStockHolderPositions.Select(inputStockHolderPosition => new DAOs.StockHolderPosition()
                 {
@@ -225,8 +225,8 @@ namespace Stock.API.Tests.UnitTests
                                         .ToList();
             });
 
-            mockMapper.Setup(mapper => mapper.Map(It.IsAny<DTOs.StockHolderPosition>(), It.IsAny<DAOs.StockHolderPosition>()))
-                      .Returns((DTOs.StockHolderPosition dtoStockPosition, DAOs.StockHolderPosition daoStockPosition) =>
+            mockMapper.Setup(mapper => mapper.Map(It.IsAny<DTOs.StockPosition>(), It.IsAny<DAOs.StockHolderPosition>()))
+                      .Returns((DTOs.StockPosition dtoStockPosition, DAOs.StockHolderPosition daoStockPosition) =>
                                {
                                    daoStockPosition.Shares = dtoStockPosition.Shares;
                                    daoStockPosition.CostBasis = dtoStockPosition.CostBasis;

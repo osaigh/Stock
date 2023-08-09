@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using DTOStock = Stock.Models.Stock;
+using DTOStockPosition = Stock.Models.StockPosition;
 
 namespace Stock.WpfClient.Surveillance.ViewModels
 {
@@ -15,7 +15,7 @@ namespace Stock.WpfClient.Surveillance.ViewModels
 
         string ChartTitle { get; }  
 
-        ObservableCollection<DTOStock> Stocks { get; }
+        ObservableCollection<DTOStockPosition> StockPositions { get; }
 
         Visibility SignedInVisibility { get; }
 

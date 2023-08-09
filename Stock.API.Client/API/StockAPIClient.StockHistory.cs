@@ -14,7 +14,7 @@ namespace Stock.APIClient.API
             return stockHistories;
         }
 
-        public async Task<List<StockHistory>> GetStockHistory(int stockId, string accessToken = null)
+        public async Task<List<StockHistory>> GetStockHistory(string stockId, string accessToken = null)
         {
             List<StockHistory> stockHistories = await this.FetchAsync<List<StockHistory>>("StockHistory/" + stockId, accessToken);
             return stockHistories;

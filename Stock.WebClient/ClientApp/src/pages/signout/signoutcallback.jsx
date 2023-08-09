@@ -4,13 +4,13 @@ import { UserAuthenticationContext } from "../../context/user-manager-context";
 
 export function SignOutCallback() {
   const { userAuthenticationService } = useContext(UserAuthenticationContext);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const navigate = useNavigate();
-  console.log("SignOutCallback called");
   useEffect(() => {
     console.log("SignOutCallback UseEffect");
     const handler = () => {
       console.log("SignOutCallback handler");
-      navigate.push("/");
+      setIsRedirecting(true);
     };
 
     async function signoutasync() {
@@ -24,5 +24,6 @@ export function SignOutCallback() {
 
     signoutasync();
   }, [navigate]);
-  return <div>Redirecting</div>;
+
+  return isRedirecting ? <Navigate to="/" /> : <div>Redirecting</div>;
 }

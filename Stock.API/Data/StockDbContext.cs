@@ -11,10 +11,9 @@ namespace Stock.API.Data
     {
         #region Properties
         public DbSet<Models.Stock> Stocks { get; set; }
-        public DbSet<StockPrice> StockPrices { get; set; }
         public DbSet<StockHistory> StockHistories { get; set; }
-        public DbSet<StockHolder> StockHolders { get; set; }
-        public DbSet<StockHolderPosition> StockHolderPositions { get; set; }
+        public DbSet<StockOrder> StockOrders { get; set; }
+        public DbSet<StockPosition> StockPositions { get; set; }
         #endregion
 
         #region Constructor
@@ -29,38 +28,36 @@ namespace Stock.API.Data
         {
             modelBuilder.Entity<Models.Stock>()
                         .ToTable("Stock")
-                        .HasKey(s => s.Id);
-
-            modelBuilder.Entity<StockPrice>()
-                        .ToTable("StockPrice")
-                        .HasKey(s => s.Id);
-
-            modelBuilder.Entity<StockPrice>()
-                        .HasOne(s => s.Stock)
-                        .WithMany()
-                        .HasForeignKey(s => s.StockId);
+                        .HasKey(s => s.StockId);
 
             modelBuilder.Entity<StockHistory>()
                         .ToTable("StockHistory")
-                        .HasKey(s => s.Id);
+                        .HasKey(s => s.StockHistoryId);
 
             modelBuilder.Entity<StockHistory>()
                         .HasOne<Models.Stock>()
                         .WithMany(s => s.StockHistories)
                         .HasForeignKey(s => s.StockId);
 
-            modelBuilder.Entity<StockHolder>()
-                        .ToTable("StockHolder")
-                        .HasKey(s => s.Username);
+            modelBuilder.Entity<StockOrder>()
+                        .ToTable("StockOrder")
+                        .HasKey(s => s.StockOrderId);
 
-            modelBuilder.Entity<StockHolderPosition>()
-                        .ToTable("StockHolderPosition")
-                        .HasKey(s => s.Id);
+            modelBuilder.Entity<StockPosition>()
+                        .ToTable("StockPosition")
+                        .HasKey(s => s.StockPositionId);
 
-            modelBuilder.Entity<StockHolderPosition>()
-                        .HasOne(s => s.StockHolder)
-                        .WithMany(s => s.StockHolderPositions)
-                        .HasForeignKey(s => s.StockHolderId);
+            modelBuilder.Entity<StockPosition>()
+                        .HasOne<Models.Stock>(s => s.Stock)
+                        .WithMany()
+                        .HasForeignKey(s => s.StockId);
+
+            //modelBuilder.Entity<Models.Stock>()
+            //           .ToTable("Stock")
+            //           .HasMany<Models.StockPosition>()
+            //           .WithOne(s => s.StockId)
+            //           .HasForeignKey(s => s.StockId);
+
         }
 
         #endregion

@@ -8,15 +8,15 @@ namespace Stock.APIClient.API
 {
     public partial class StockAPIClient
     {
-        public async Task<List<StockPrice>> GetStockPrices()
+        public async Task<List<StockPositionSummary>> GetStockPrices()
         {
-            List<StockPrice> stockPrices = await this.FetchAsync<List<StockPrice>>("StockPrice/");
+            List<StockPositionSummary> stockPrices = await this.FetchAsync<List<StockPositionSummary>>("StockPrice/");
             return stockPrices;
         }
 
-        public async Task<StockPrice> GetStockPrice(int id)
+        public async Task<StockPositionSummary> GetStockPrice(int id)
         {
-            StockPrice stockPrice = await this.FetchAsync<StockPrice>("StockPrice/"+ id);
+            StockPositionSummary stockPrice = await this.FetchAsync<StockPositionSummary>("StockPrice/"+ id);
             return stockPrice;
         }
     }

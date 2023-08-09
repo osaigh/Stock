@@ -54,9 +54,9 @@ namespace Stock.API.Controllers.api
         [HttpGet("{stockId}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(IEnumerable<DTOStockHistory>), (int)(HttpStatusCode.OK))]
-        public async Task<ActionResult<IEnumerable<DTOStockHistory>>> Get(int stockId)
+        public async Task<ActionResult<IEnumerable<DTOStockHistory>>> Get(string stockId)
         {
-            if (stockId <= 0)
+            if (string.IsNullOrEmpty(stockId))
             {
                 return new BadRequestObjectResult("stockId is null");
             }

@@ -1,17 +1,24 @@
 import React, { useEffect, useState,useContext } from 'react';
 import "./navbar.scss"
-import FullScreenExitOutlinedIcon from '@mui/icons-material/FullscreenExitOutlined';
-import NotificationsNoneOutlined from '@mui/icons-material/NotificationsNoneOutlined';
-import ChatBubbleOutlinedOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined'
-import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useDispatch } from 'react-redux';
 import { toggleState } from '../../slices/sidebar-slice';
 import { UserAuthenticationContext } from "../../context/user-manager-context";
 import "bootstrap/dist/css/bootstrap.min.css";
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import Avatar from '@mui/material/Avatar';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 
 const Navbar = () => {
+    const [anchorElUser, setAnchorElUser] = useState(null);
     const dispatch = useDispatch();
     const [user, setUser] = useState(null);
     const { userAuthenticationService } = useContext(UserAuthenticationContext);  
@@ -33,6 +40,14 @@ const Navbar = () => {
         console.log(newStatus);
         dispatch(toggleState(newStatus));
     }
+
+    const handleCloseUserMenu = () => {
+        setAnchorElUser(null);
+      };
+
+    const handleOpenUserMenu = (event) => {
+        setAnchorElUser(event.currentTarget);
+      };
     
     const signOut = function () {
         userAuthenticationService.signOut();
@@ -42,44 +57,64 @@ const Navbar = () => {
         userAuthenticationService.signIn();
     };
 
-    let headerBar = "";
+    let headerBar;
     if(user){
         headerBar = (
-            <div className="items">
-                    <div className="items">
-                        <img src="user2-160x160.jpg"
-                        alt=""
-                        className='avatar'
-                        />
-                    </div>
-
-                    <div className="items" >
-                        <button  onClick={() => {signOut();}} className='btn btn-primary' > Sign Out </button>
-                    </div>
-                    
-                </div>
+            <Box sx={{ flexGrow: 0 }}>
+            <Tooltip title="Open settings">
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <Avatar alt="Osa " src="/user2-160x160.jpg" />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              sx={{ mt: '45px' }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+            >
+              <MenuItem onClick={() => {signOut();}}>
+                  <Typography textAlign="center">Sign Out</Typography>
+                </MenuItem>
+            </Menu>
+          </Box>
         );
     }else{
         headerBar = (
-            <div className="items">
-                   
-                    <div className="items" >
-                        <button onClick={() => {signIn();}} className='btn btn-primary' style={{marginTop:0}}> Sign In </button>
-                    </div>
-                    
-                </div>
+            <Button color="inherit" onClick={() => {signIn();}}>Login</Button>
         );
     }
 
     return (
-        <div className='navbar'>
-            <div className='wrapper' >
-                <div className="menu" onClick={menuClicked}>
-                    <MenuIcon className='icon'/>
-                </div>
+        <Box sx={{ flexGrow: 1 }}>
+            <AppBar position="static">
+            <Toolbar>
+                <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                sx={{ mr: 2 }}
+                onClick={menuClicked}
+                >
+                <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                
+                </Typography>
                 {headerBar}
-            </div>
-        </div>
+            </Toolbar>
+            </AppBar>
+        </Box>
     );
 };
 

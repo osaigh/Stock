@@ -34,7 +34,7 @@ namespace Stock.API.Tests.IntegrationTests
             //Act
             var response = await client.GetAsync(url);
             var jsonString = await response.Content.ReadAsStringAsync();
-            var stockHolders = JsonConvert.DeserializeObject<List<DTOs.StockHolder>>(jsonString);
+            var stockHolders = JsonConvert.DeserializeObject<List<DTOs.StockOrder>>(jsonString);
 
             //Assert
             Assert.NotNull(stockHolders);
@@ -53,7 +53,7 @@ namespace Stock.API.Tests.IntegrationTests
             //Act
             var response = await client.GetAsync(url + username);
             var jsonString = await response.Content.ReadAsStringAsync();
-            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockHolder>(jsonString);
+            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockOrder>(jsonString);
 
             //Assert
             Assert.NotNull(stockHolder);
@@ -70,7 +70,7 @@ namespace Stock.API.Tests.IntegrationTests
             //Act
             var response = await client.GetAsync(url+ username);
             var jsonString = await response.Content.ReadAsStringAsync();
-            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockHolder>(jsonString);
+            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockOrder>(jsonString);
 
             //Assert
             Assert.Null(stockHolder);
@@ -81,7 +81,7 @@ namespace Stock.API.Tests.IntegrationTests
         {
             //Arrange
             var client = _Factory.CreateClient();
-            var jimmyStockHolder = new DTOs.StockHolder()
+            var jimmyStockHolder = new DTOs.StockOrder()
                                    {
                                        Username = "Jimmy",
                                        Email = "jimmy@zend.com",
@@ -100,7 +100,7 @@ namespace Stock.API.Tests.IntegrationTests
             //Act
             var response = await client.PutAsync(url, stringContent);
             var jsonString = await response.Content.ReadAsStringAsync();
-            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockHolder>(jsonString);
+            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockOrder>(jsonString);
 
             //Assert
             Assert.NotNull(stockHolder);
@@ -113,7 +113,7 @@ namespace Stock.API.Tests.IntegrationTests
         {
             //Arrange
             var client = _Factory.CreateClient();
-            var abrahamStockHolder = new DTOs.StockHolder()
+            var abrahamStockHolder = new DTOs.StockOrder()
                                      {
                                          Username = "Abraham",
                                          Email = "abraham@zend.com",
@@ -132,7 +132,7 @@ namespace Stock.API.Tests.IntegrationTests
             //Act
             var response = await client.PutAsync(url, stringContent);
             var jsonString = await response.Content.ReadAsStringAsync();
-            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockHolder>(jsonString);
+            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockOrder>(jsonString);
 
 
             //Assert
@@ -144,7 +144,7 @@ namespace Stock.API.Tests.IntegrationTests
         {
             //Arrange
             var client = _Factory.CreateClient();
-            var gabiStockHolder = new DTOs.StockHolder()
+            var gabiStockHolder = new DTOs.StockOrder()
                                      {
                                          Username = "Gabi",
                                          Email = "gabi@rely.com",
@@ -163,7 +163,7 @@ namespace Stock.API.Tests.IntegrationTests
             //Act
             var response = await client.PostAsync(url, stringContent);
             var jsonString = await response.Content.ReadAsStringAsync();
-            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockHolder>(jsonString);
+            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockOrder>(jsonString);
 
             //Assert
             Assert.NotNull(stockHolder);
@@ -176,7 +176,7 @@ namespace Stock.API.Tests.IntegrationTests
         {
             //Arrange
             var client = _Factory.CreateClient();
-            var gabiStockHolder = new DTOs.StockHolder()
+            var gabiStockHolder = new DTOs.StockOrder()
                                   {
                                       Username = string.Empty,
                                       Email = "tret@yahoo.com",
@@ -195,7 +195,7 @@ namespace Stock.API.Tests.IntegrationTests
             //Act
             var response = await client.PostAsync(url, stringContent);
             var jsonString = await response.Content.ReadAsStringAsync();
-            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockHolder>(jsonString);
+            var stockHolder = JsonConvert.DeserializeObject<DTOs.StockOrder>(jsonString);
 
             //Assert
             Assert.Null(stockHolder);

@@ -108,6 +108,35 @@ namespace Stock.API
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "StockAPI", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                  {
+                    {
+                      new OpenApiSecurityScheme
+                      {
+                        Reference = new OpenApiReference
+                          {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                          },
+                          Scheme = "oauth2",
+                          Name = "Bearer",
+                          In = ParameterLocation.Header,
+
+                        },
+                        new List<string>()
+                      }
+                    });
             });
 
 
@@ -115,11 +144,11 @@ namespace Stock.API
             services.AddScoped<IStockMarketService, StockMarketService>();
 
             //Repositories
-            services.AddScoped<IRepository<StockHolder>, StockHolderRepository>();
-            services.AddScoped<IRepository<StockHolderPosition>, StockHolderPositionRepository>();
+            services.AddScoped<IRepository<StockOrder>, StockOrderRepository>();
+            services.AddScoped<IRepository<StockPosition>, StockPositionRepository>();
             services.AddScoped<IRepository<Stock.API.Models.Stock>, StockRepository>();
             services.AddScoped<IRepository<Stock.API.Models.StockHistory>, StockHistoryRepository>();
-            services.AddScoped<IRepository<StockPrice>, StockPriceRepository>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -163,9 +192,11 @@ namespace Stock.API
 
             //app.UseHttpsRedirection();
 
-            app.UseCors("AllowAll");
+            
 
             app.UseRouting();
+
+            app.UseCors("AllowAll");
 
             app.UseAuthentication();
 

@@ -21,7 +21,7 @@ export default class UserAuthenticationService {
   };
 
   signOut = function () {
-    alert("SignOut called");
+    //alert("SignOut called");
     this.currentuser = null;
     this.UserManager.signoutRedirect();
   };
@@ -62,5 +62,9 @@ export default class UserAuthenticationService {
 
   getCurrentUser() {
     return this.currentuser;
+  }
+
+  getSignUpEndPoint(){
+    return `${IdentityConfig.authority}auth/register`;
   }
 }

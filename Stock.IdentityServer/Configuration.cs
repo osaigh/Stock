@@ -95,7 +95,7 @@ namespace Stock.IdentityServer
                 new Client(){
                     ClientId = "client_id_react",
                     RedirectUris = { "http://localhost:44602/SignInCallback" },
-                    PostLogoutRedirectUris = { "http://localhost:44602/Home/" },
+                    PostLogoutRedirectUris = { "http://localhost:44602/signoutcallback" },
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "ApiOne","ApiTwo","StockAPI"},
                     AllowOfflineAccess = true,

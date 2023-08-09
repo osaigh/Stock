@@ -47,17 +47,17 @@ namespace Stock.API.Controllers.api
             return Ok(dtoStocks);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{stockId}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(DTOStock), (int)(HttpStatusCode.OK))]
-        public async Task<ActionResult<DTOStock>> Get(int id)
+        public async Task<ActionResult<DTOStock>> Get(string stockId)
         {
-            if (id <= 0)
+            if (string.IsNullOrEmpty(stockId))
             {
-                return new BadRequestObjectResult("id is null");
+                return new BadRequestObjectResult("stockId is is not valid");
             }
 
-            var daoStock = await _StockRepository.GetAsync(id);
+            var daoStock = await _StockRepository.GetAsync(stockId);
 
             if (daoStock == null)
             {

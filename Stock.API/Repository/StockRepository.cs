@@ -41,7 +41,7 @@ namespace Stock.API.Repository
 
         public async Task DeleteAsync(DAOStock stock)
         {
-            var _stock = await GetAsync(stock.Id);
+            var _stock = await GetAsync(stock.StockId);
             if (_stock != null)
             {
                 _StockDbContext.Stocks.Remove(_stock);
@@ -65,15 +65,14 @@ namespace Stock.API.Repository
 
         public async Task<DAOStock> GetAsync(object id)
         {
-            int key = int.Parse(id.ToString());
             return await _StockDbContext.Stocks
                                          //.Include(s => s.StockHistories)
-                                         .FirstOrDefaultAsync(s => s.Id == key);
+                                         .FirstOrDefaultAsync(s => s.StockId == id.ToString());
         }
 
         public async Task<DAOStock> UpdateAsync(DAOStock stock)
         {
-            var _stock = await GetAsync(stock.Id);
+            var _stock = await GetAsync(stock.StockId);
 
             if (_stock == null)
             {

@@ -35,7 +35,7 @@ namespace Stock.API.Tests.IntegrationTests
             //Act
             var response = await client.GetAsync(url+ username);
             var jsonString = await response.Content.ReadAsStringAsync();
-            var stockHolderPositions = JsonConvert.DeserializeObject<List<DTOs.StockHolderPosition>>(jsonString);
+            var stockHolderPositions = JsonConvert.DeserializeObject<List<DTOs.StockPosition>>(jsonString);
 
             //Assert
             Assert.NotNull(stockHolderPositions);
@@ -52,7 +52,7 @@ namespace Stock.API.Tests.IntegrationTests
             //Act
             var response = await client.GetAsync(url + username);
             var jsonString = await response.Content.ReadAsStringAsync();
-            var stockHolderPositions = JsonConvert.DeserializeObject<List<DTOs.StockHolderPosition>>(jsonString);
+            var stockHolderPositions = JsonConvert.DeserializeObject<List<DTOs.StockPosition>>(jsonString);
 
             //Assert
             Assert.NotNull(stockHolderPositions);
@@ -64,7 +64,7 @@ namespace Stock.API.Tests.IntegrationTests
         {
             //Arrange
             var client = _Factory.CreateClient();
-            var _stockHolderPosition = new DTOs.StockHolderPosition()
+            var _stockHolderPosition = new DTOs.StockPosition()
                                              {
                                                  StockHolderId = "Steve",
                                                  Shares = 30,
@@ -84,7 +84,7 @@ namespace Stock.API.Tests.IntegrationTests
             //Act
             var response = await client.PostAsync(url, stringContent);
             var jsonString = await response.Content.ReadAsStringAsync();
-            var stockHolderPosition = JsonConvert.DeserializeObject<DTOs.StockHolderPosition>(jsonString);
+            var stockHolderPosition = JsonConvert.DeserializeObject<DTOs.StockPosition>(jsonString);
 
             //Assert
             Assert.NotNull(stockHolderPosition);
@@ -96,7 +96,7 @@ namespace Stock.API.Tests.IntegrationTests
         {
             //Arrange
             var client = _Factory.CreateClient();
-            var _stockHolderPosition = new DTOs.StockHolderPosition()
+            var _stockHolderPosition = new DTOs.StockPosition()
                                        {
                                            StockHolderId = string.Empty,
                                            Shares = 30,
@@ -116,7 +116,7 @@ namespace Stock.API.Tests.IntegrationTests
             //Act
             var response = await client.PostAsync(url, stringContent);
             var jsonString = await response.Content.ReadAsStringAsync();
-            var stockHolderPosition = JsonConvert.DeserializeObject<DTOs.StockHolderPosition>(jsonString);
+            var stockHolderPosition = JsonConvert.DeserializeObject<DTOs.StockPosition>(jsonString);
 
             //Assert
             Assert.Null(stockHolderPosition);

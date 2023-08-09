@@ -9,42 +9,42 @@ namespace Stock.APIClient.API
 {
     public partial class StockAPIClient
     {
-        public async Task<List<StockHolder>> GetStockHolders()
+        public async Task<List<StockOrder>> GetStockOrders()
         {
-            List<StockHolder> stockHolders = await this.FetchAsync<List<StockHolder>>("StockHolder/");
-            return stockHolders;
+            List<StockOrder> stockOrders = await this.FetchAsync<List<StockOrder>>("StockOrder/");
+            return stockOrders;
         }
 
-        public async Task<StockHolder> GetStockHolder(string username)
+        public async Task<StockOrder> GetStockOrder(string stockId)
         {
-            StockHolder stockHolder = await this.FetchAsync<StockHolder>("StockHolder/" + username);
-            return stockHolder;
+            StockOrder stockOrder = await this.FetchAsync<StockOrder>("StockOrder/" + stockId);
+            return stockOrder;
         }
 
-        public async Task<StockHolder> CreateStockHolder(StockHolder stockHolder)
+        public async Task<StockOrder> CreateStockOrder(StockOrder stockOrder)
         {
-            string jsonIn = JsonConvert.SerializeObject(stockHolder);
+            string jsonIn = JsonConvert.SerializeObject(stockOrder);
             ApiRequest apiRequest = new ApiRequest()
                                     {
                                         JsonString = jsonIn
                                     };
 
             string apiRequestString = JsonConvert.SerializeObject(apiRequest);
-            stockHolder = await this.PostAsync<StockHolder>("StockHolder/" ,apiRequestString);
-            return stockHolder;
+            stockOrder = await this.PostAsync<StockOrder>("StockOrder/", apiRequestString);
+            return stockOrder;
         }
 
-        public async Task<StockHolder> UpdateStockHolder(StockHolder stockHolder)
-        {
-            string jsonIn = JsonConvert.SerializeObject(stockHolder);
-            ApiRequest apiRequest = new ApiRequest()
-                                    {
-                                        JsonString = jsonIn
-                                    };
+        //public async Task<StockOrder> UpdateStockHolder(StockOrder stockHolder)
+        //{
+        //    string jsonIn = JsonConvert.SerializeObject(stockHolder);
+        //    ApiRequest apiRequest = new ApiRequest()
+        //                            {
+        //                                JsonString = jsonIn
+        //                            };
 
-            string apiRequestString = JsonConvert.SerializeObject(apiRequest);
-            stockHolder = await this.UpdateAsync<StockHolder>("StockHolder/", apiRequestString);
-            return stockHolder;
-        }
+        //    string apiRequestString = JsonConvert.SerializeObject(apiRequest);
+        //    stockHolder = await this.UpdateAsync<StockOrder>("StockHolder/", apiRequestString);
+        //    return stockHolder;
+        //}
     }
 }
