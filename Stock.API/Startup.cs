@@ -1,27 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using System.Net;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-using Stock.API.Data;
-using Stock.API.Repository;
-using Stock.API.Models;
-using System.Net;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using Newtonsoft.Json;
+using Stock.API.Data;
 using Stock.API.Errors;
+using Stock.API.Models;
+using Stock.API.Repository;
 using Stock.API.Services;
-using IdentityServer4.AccessTokenValidation;
 
 namespace Stock.API
 {
@@ -41,24 +36,21 @@ namespace Stock.API
         {
             services.AddControllers();
 
-            //Database
-            string connectionString = _Configuration.GetConnectionString("DefaultConnection");
+            string identityServerUrl = _Configuration.GetValue<string>("IdentityServerUrl");
+            string apiScope = _Configuration.GetValue<string>("APIScope");
 
-            string identityServerUrl = _Configuration.GetValue(typeof(string), "IdentityServerUrl").ToString();
-            string apiScope = _Configuration.GetValue(typeof(string), "APIScope").ToString();
-
-            //To run Stock.API.Test comeent out lines 47 - 64 and comment out the Authorization headers on the controllers
-            services.AddAuthentication(options => options.DefaultScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer("Bearer",
+            services.AddAuthentication(options => options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,
                                   config =>
                                   {
                                       config.Authority = identityServerUrl;
-                                      config.Audience = apiScope;
+                                      //The identity server runs on plain http for local development
                                       config.RequireHttpsMetadata = false;
-                                      config.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                                      config.TokenValidationParameters = new TokenValidationParameters()
                                       {
+                                          //The identity server issues tokens without an audience; access is checked by scope instead
                                           ValidateAudience = false,
-
+                                          ValidTypes = new[] { "at+jwt" },
                                       };
                                   });
 
@@ -67,7 +59,7 @@ namespace Stock.API
                                           options.AddPolicy("StockAPIPolicy",
                                                             policy =>
                                                             {
-                                                                policy.AuthenticationSchemes.Add("Bearer");
+                                                                policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                                                                 policy.AddRequirements(new Stock.API.Authorization.StockAPIRequirement(apiScope));
                                                             });
 
@@ -86,6 +78,8 @@ namespace Stock.API
                                                   });
                              });
 
+            //Database. The data lives in memory and is re-seeded every time the API starts.
+            //string connectionString = _Configuration.GetConnectionString("DefaultConnection");
             //if (_WebHostEnvironment.IsDevelopment())
             //{
             //    if (connectionString.Contains("%CONTENTROOTPATH%"))
@@ -97,46 +91,23 @@ namespace Stock.API
 
             services.AddDbContext<StockDbContext>(options => options.UseInMemoryDatabase("InMemoryDbFor"));
 
-            //AutoMapper
-            var mappingConfiguration = new MapperConfiguration(config =>
-                                                               {
-                                                                   config.AddProfile(new MappingProfile());
-                                                               });
-            IMapper mapper = mappingConfiguration.CreateMapper();
-            services.AddSingleton(mapper);
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "StockAPI", Version = "v1" });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
-                      Enter 'Bearer' [space] and then your token in the text input below.
-                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Description = "JWT access token issued by Stock.IdentityServer. Enter the token only, without the 'Bearer' prefix.",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer"
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT"
                 });
 
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-                  {
-                    {
-                      new OpenApiSecurityScheme
-                      {
-                        Reference = new OpenApiReference
-                          {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                          },
-                          Scheme = "oauth2",
-                          Name = "Bearer",
-                          In = ParameterLocation.Header,
-
-                        },
-                        new List<string>()
-                      }
-                    });
+                c.AddSecurityRequirement(document => new OpenApiSecurityRequirement()
+                {
+                    [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+                });
             });
 
 
@@ -156,16 +127,8 @@ namespace Stock.API
         {
             if (env.IsDevelopment())
             {
-                //app.UseDeveloperExceptionPage();
                 SeedData.InitializeDB(stockDbContext);
             }
-
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "StockAPI v1");
-            });
 
             app.UseExceptionHandler(appError =>
                                     {
@@ -190,9 +153,12 @@ namespace Stock.API
                                                      });
                                     });
 
-            //app.UseHttpsRedirection();
+            app.UseSwagger();
 
-            
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "StockAPI v1");
+            });
 
             app.UseRouting();
 

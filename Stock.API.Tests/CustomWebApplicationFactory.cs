@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Stock.API.Data;
 
 namespace Stock.API.Tests
@@ -16,44 +15,53 @@ namespace Stock.API.Tests
     public class CustomWebApplicationFactory<TStartup>
         : WebApplicationFactory<TStartup> where TStartup : class
     {
+        //Every factory gets its own database, so test classes do not see each other's changes
+        private readonly string _databaseName = "InMemoryDbForTesting-" + Guid.NewGuid();
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            builder.ConfigureServices(services =>
-                                      {
-                                          var descriptor = services.SingleOrDefault(
-                                              d => d.ServiceType ==
-                                                   typeof(DbContextOptions<StockDbContext>));
+            //Not Development, so the API does not seed its own demo data
+            builder.UseEnvironment("Testing");
 
-                                          services.Remove(descriptor);
-
-                                          services.AddDbContext<StockDbContext>(options =>
-                                                                                {
-                                                                                    options.UseInMemoryDatabase("InMemoryDbForTesting");
-                                                                                });
-
-                                          var sp = services.BuildServiceProvider();
-
-                                          using (var scope = sp.CreateScope())
+            builder.ConfigureTestServices(services =>
                                           {
-                                              var scopedServices = scope.ServiceProvider;
-                                              var db = scopedServices.GetRequiredService<StockDbContext>();
-                                              var logger = scopedServices
-                                                  .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
+                                              var descriptors = services.Where(
+                                                  d => d.ServiceType == typeof(DbContextOptions<StockDbContext>)
+                                                       || d.ServiceType == typeof(IDbContextOptionsConfiguration<StockDbContext>)).ToList();
 
-                                              db.Database.EnsureCreated();
+                                              foreach (var descriptor in descriptors)
+                                              {
+                                                  services.Remove(descriptor);
+                                              }
 
-                                              try
+                                              services.AddDbContext<StockDbContext>(options =>
+                                                                                    {
+                                                                                        options.UseInMemoryDatabase(_databaseName);
+                                                                                    });
+
+                                              //Validate access tokens against the test signing key instead of downloading
+                                              //the keys from the identity server
+                                              services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
                                               {
-                                                  Utilities.InitializeDbForTests(db);
-                                              }
-                                              catch (Exception ex)
-                                              {
-                                                  logger.LogError(ex, "An error occurred seeding the " +
-                                                                      "database with test messages. Error: {Message}", ex.Message);
-                                              }
-                                          }
-                                      });
+                                                  options.ConfigurationManager = null;
+                                                  options.TokenValidationParameters.ValidIssuer = TestTokens.Issuer;
+                                                  options.TokenValidationParameters.IssuerSigningKey = TestTokens.SigningKey;
+                                              });
+                                          });
         }
 
+        protected override IHost CreateHost(IHostBuilder builder)
+        {
+            var host = base.CreateHost(builder);
+
+            using (var scope = host.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<StockDbContext>();
+                db.Database.EnsureCreated();
+                Utilities.InitializeDbForTests(db);
+            }
+
+            return host;
+        }
     }
 }

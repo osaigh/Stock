@@ -1,10 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>@ViewBag.Title</title>
-    <link href="~/lib/bootstrap-v4-rtl/css/bootstrap.min.css"  rel="stylesheet"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewBag.Title - Stock Identity Server</title>
+    <link rel="icon" href="data:," />
+    <link href="~/lib/bootstrap/css/bootstrap.min.css"  rel="stylesheet"/>
     @RenderSection("Styles", false)
 </head>
 <body>
@@ -13,8 +15,7 @@
     </div>
 
     <script src="~/lib/jquery/jquery.min.js"></script>
-    <script src="~/lib/bootstrap-v4-rtl/js/bootstrap.min.js"></script>
-    <script src="~/lib/popper.js/umd/popper.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

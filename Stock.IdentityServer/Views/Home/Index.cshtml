@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<hr />
+<section>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h1>Stock Identity Server</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mx-auto text-center">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <p>You are signed in as <strong>@User.Identity.Name</strong>. You can now go back to the application.</p>
+                    <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-primary">Sign Out</a>
+                }
+                else
+                {
+                    <p>You are not signed in.</p>
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-primary">Login</a>
+                    <a asp-controller="Auth" asp-action="Register" class="btn btn-outline-primary">Register</a>
+                }
+                <p class="mt-4">
+                    <a href="~/.well-known/openid-configuration">OpenID Connect discovery document</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>

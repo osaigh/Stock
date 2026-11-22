@@ -1,14 +1,11 @@
-import React from 'react';
 import "./sidebar.scss"
-import HomeIcon from "@mui/icons-material/Home";
 import { useSelector } from 'react-redux';
-import classNames from 'classnames';
 import { Link } from "react-router-dom";
 import useWindowSize from '../../hooks/windowHook';
 import Box from '@mui/material/Box';
 import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import SellIcon from '@mui/icons-material/Sell';
@@ -17,12 +14,6 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 const Sidebar = () => {
     const status = useSelector(state => state.sidebar.status);
     const windowSize  = useWindowSize();
-
-    
-    let sidebarClassList = classNames('sidebar');
-    let headingClassList = classNames('title');
-    let spanClassList = classNames('');
-    let brandClassList = classNames("brand");
 
     const brandLinkStyle = {
         height: '64px',
@@ -47,7 +38,9 @@ const Sidebar = () => {
         backgroundColor: '#006AC3',
         transition: '.7s ease',
         boxShadow: '2px 2px 10px 1px rgb(185, 183, 183)',
-        
+        // Without this the link text spills out of the collapsed sidebar and
+        // stays clickable on top of the page content.
+        overflow: 'hidden',
     };
     const subHeadingStyle = {
         backgroundColor:'transparent',
@@ -65,48 +58,39 @@ const Sidebar = () => {
         }
     }
 
+    // MUI 9 narrowed the default icon column from 56px to 36px; keep the original spacing.
+    const listItemIconStyle = {
+        minWidth: '56px',
+    };
+
     const listItemTextStyle = {
         color: 'white',
-        marginLeft:"0", 
+        marginLeft:"0",
         paddingTop:'1px'
     }
 
+    // The toolbar button toggles the status: on a wide window that collapses the
+    // sidebar to its icons, on a narrow one it reveals the otherwise hidden sidebar.
+    const toggled = status === 'hide';
+
     if(windowSize.width < 767){
-        if(status.length > 0 ){
-            
-            sidebarClassList = classNames('sidebar',"show");
-            headingClassList = classNames('title');
-            brandClassList = classNames("brand");
-            subHeadingStyle.visibility= 'visible';
-            sideBarContainerStyle.width = '280px';
-            brandLinkStyle.visibility = 'visible';
-        }else{
+        if(!toggled){
             subHeadingStyle.visibility= 'collapse';
             iconStyle.visibility = 'collapse';
             brandLinkStyle.visibility = 'collapse';
             sideBarContainerStyle.width = '0px';
         }
-    }else{
-        if(status.length > 0 ){
-            subHeadingStyle.visibility= 'collapse';
-            listItemTextStyle.display = 'none';
-            if(status === 'hide'){
-                sideBarContainerStyle.width = '60px';
-            }else{
-                sideBarContainerStyle.width = '280px';
-            }
-            sidebarClassList = classNames('sidebar',status);
-            headingClassList = classNames('title','hideheading');
-            spanClassList = classNames('hidespan');
-            brandClassList = classNames("brand",'hideheading');
-            brandLinkStyle.visibility = 'collapse';
-        }
+    }else if(toggled){
+        subHeadingStyle.visibility= 'collapse';
+        listItemTextStyle.display = 'none';
+        brandLinkStyle.visibility = 'collapse';
+        sideBarContainerStyle.width = '60px';
     }
-   
+
     return (
         <Box sx={sideBarContainerStyle}>
             <Box ><Link  to="/" style={brandLinkStyle}>Stock Trader</Link></Box>
-           
+
             <Box >
                 <List
                     component="nav"
@@ -117,26 +101,22 @@ const Sidebar = () => {
                       </ListSubheader>
                     }
                 >
-                    <Link to="/" style={{ textDecoration: "none" }}>
-                        <ListItem sx={listItemStyle} >
-                            <ListItemIcon >
-                                <AccountBalanceIcon sx={iconStyle}/>
-                            </ListItemIcon >
-                            <ListItemText sx={listItemTextStyle}  primary="Stocks" />
-                        </ListItem>
-                    </Link>
-                    <Link to="/orders" style={{ textDecoration: "none" }}>
-                        <ListItem sx={listItemStyle}>
-                            <ListItemIcon >
-                                <SellIcon sx={iconStyle}/>
-                            </ListItemIcon >
-                            <ListItemText sx={listItemTextStyle} primary="Orders" />
-                        </ListItem>
-                    </Link>
-                    
+                    <ListItemButton component={Link} to="/" sx={listItemStyle}>
+                        <ListItemIcon sx={listItemIconStyle}>
+                            <AccountBalanceIcon sx={iconStyle}/>
+                        </ListItemIcon >
+                        <ListItemText sx={listItemTextStyle}  primary="Stocks" />
+                    </ListItemButton>
+                    <ListItemButton component={Link} to="/orders" sx={listItemStyle}>
+                        <ListItemIcon sx={listItemIconStyle}>
+                            <SellIcon sx={iconStyle}/>
+                        </ListItemIcon >
+                        <ListItemText sx={listItemTextStyle} primary="Orders" />
+                    </ListItemButton>
+
                 </List>
             </Box>
-            
+
         </Box>
     );
 };

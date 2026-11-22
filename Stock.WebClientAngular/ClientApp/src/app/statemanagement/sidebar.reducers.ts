@@ -1,25 +1,17 @@
-import { Action } from '@ngrx/store';
-import { ActionTypes } from './sidebar.actions';
+import { createReducer, on } from '@ngrx/store';
+import { onAppClicked, toggleState } from './sidebar.actions';
 
-export const initialState= {status:""};
+export interface SidebarState {
+  status: '' | 'hide';
+}
 
-export function sidebarReducer(state = initialState, action: Action) {
-    const newState = {...state};
-    switch (action.type) {
-      case ActionTypes.ToggleState:
-        if(newState.status == "hide"){
-            newState.status = "";
-        }else{
-            newState.status = "hide";
-        }
+export const initialState: SidebarState = { status: '' };
 
-        return newState;
-   
-      case ActionTypes.OnAppClicked:
-        newState.status = "";
-        return newState;
-   
-      default:
-        return newState;
-    }
-  }
+export const sidebarReducer = createReducer(
+  initialState,
+  on(toggleState, (state): SidebarState => ({
+    ...state,
+    status: state.status === 'hide' ? '' : 'hide',
+  })),
+  on(onAppClicked, (state): SidebarState => ({ ...state, status: '' })),
+);

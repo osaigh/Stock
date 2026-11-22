@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Stock.API.Data;
 using Stock.API.Models;
@@ -14,14 +13,12 @@ namespace Stock.API.Repository
     {
         #region fields
         private readonly StockDbContext _StockDbContext;
-        private readonly IMapper _Mapper;
         #endregion
 
         #region Constructor
-        public StockHistoryRepository(StockDbContext stockDbContext, IMapper mapper)
+        public StockHistoryRepository(StockDbContext stockDbContext)
         {
             _StockDbContext = stockDbContext;
-            _Mapper = mapper;
         }
         #endregion
 
@@ -95,7 +92,7 @@ namespace Stock.API.Repository
 
             if (!ReferenceEquals(stockHistory, _stockHistory))
             {
-                _Mapper.Map(stockHistory, _stockHistory);
+                _StockDbContext.Entry(_stockHistory).CurrentValues.SetValues(stockHistory);
             }
 
             await _StockDbContext.SaveChangesAsync();

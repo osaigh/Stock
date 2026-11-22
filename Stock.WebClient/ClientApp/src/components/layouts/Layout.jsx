@@ -1,4 +1,3 @@
-import React from "react";
 import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
 import { useSelector } from 'react-redux';
@@ -6,7 +5,7 @@ import Box from '@mui/material/Box';
 
 function Layout(props) {
     const status = useSelector(state => state.sidebar.status);
-    
+
     const containerStyle = {
         width:"100%", height:"100%"
     };
@@ -40,8 +39,6 @@ function Layout(props) {
               }
         };
     }
-
-    
 
   return (
     <Box sx={containerStyle}>

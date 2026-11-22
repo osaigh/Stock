@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityModel;
-using IdentityServer4;
-using IdentityServer4.Models;
+using Duende.IdentityServer;
+using Duende.IdentityServer.Models;
 
 namespace Stock.IdentityServer
 {
@@ -77,43 +76,43 @@ namespace Stock.IdentityServer
             //                             }
             //                         };
 
+            //The web clients are public clients (they cannot keep a secret), so they use the authorization code flow with PKCE
             return new List<Client>(){
                 new Client()
                 {
                     ClientId = "client_id_angular",
-                    RedirectUris = { "http://localhost:44902/SignInCallback" },
-                    PostLogoutRedirectUris = { "http://localhost:44902" },
-                    AllowedGrantTypes = GrantTypes.Implicit,
+                    ClientName = "Stock Angular client",
+                    RedirectUris = { "http://localhost:44902/signincallback" },
+                    PostLogoutRedirectUris = { "http://localhost:44902/signoutcallback" },
+                    AllowedGrantTypes = GrantTypes.Code,
                     AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "ApiOne","ApiTwo","StockAPI"},
                     AllowOfflineAccess = true,
                     RequireClientSecret = false,
-                    AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
                     AllowedCorsOrigins = { "http://localhost:44902" },
                     AccessTokenLifetime = 3600,
                 },
                 new Client(){
                     ClientId = "client_id_react",
-                    RedirectUris = { "http://localhost:44602/SignInCallback" },
+                    ClientName = "Stock React client",
+                    RedirectUris = { "http://localhost:44602/signincallback" },
                     PostLogoutRedirectUris = { "http://localhost:44602/signoutcallback" },
-                    AllowedGrantTypes = GrantTypes.Implicit,
+                    AllowedGrantTypes = GrantTypes.Code,
                     AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "ApiOne","ApiTwo","StockAPI"},
                     AllowOfflineAccess = true,
                     RequireClientSecret = false,
                     RequireConsent = false,
-                    AllowAccessTokensViaBrowser = true,
                     AllowedCorsOrigins = { "http://localhost:44602" },
                     AccessTokenLifetime = 3600,
                 },
                 new Client()
                 {
                     ClientId = "wpfclient",
-                    FrontChannelLogoutUri = "http://127.0.0.1:44801/",
+                    ClientName = "Stock WPF client",
                     RedirectUris = { "http://127.0.0.1:44801/" },
                     PostLogoutRedirectUris = { "http://127.0.0.1:44801/" },
-                    AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
+                    AllowedGrantTypes = GrantTypes.Code,
                     AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.Email, "StockAPI"},
-                    AllowAccessTokensViaBrowser = true,
                     AllowOfflineAccess = true,
                     RequireClientSecret = false,
                     RequireConsent = false,
@@ -125,10 +124,9 @@ namespace Stock.IdentityServer
 
         }
 
-
         /*****Open Id Configuration *******/
         /*
-         * https://localhost:44376/.well-known/openid-configuration* 
+         * http://localhost:44702/.well-known/openid-configuration* 
          */
     }
 }

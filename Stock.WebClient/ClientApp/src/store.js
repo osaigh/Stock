@@ -1,4 +1,4 @@
-import { configureStore ,Store} from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import sidebarReducer from './slices/sidebar-slice';
 import appReducer from './slices/app-slice';
 

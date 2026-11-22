@@ -1,0 +1,35 @@
+.maincontent {
+  width: calc(100% - 280px);
+  height: 200px;
+  position: relative;
+  top: 0;
+  left: 280px;
+  transition: 0.7s ease;
+}
+
+.maincontent.expand {
+  width: calc(100% - 60px);
+  left: 60px;
+}
+
+.stock-container {
+  width: 100%;
+}
+
+.content {
+  padding-top: 20px;
+}
+
+/* Media Query for Mobile Devices */
+@media (max-width: 767px) {
+  /* The sidebar is 60px wide by default on mobile and 280px when shown. */
+  .maincontent {
+    width: calc(100% - 60px);
+    left: 60px;
+  }
+
+  .maincontent.expand {
+    width: calc(100% - 280px);
+    left: 280px;
+  }
+}

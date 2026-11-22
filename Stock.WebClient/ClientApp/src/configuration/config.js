@@ -1,28 +1,24 @@
-import Oidc from "oidc-client";
+import { WebStorageStateStore } from "oidc-client-ts";
 
+const identityServerUrl = "http://localhost:44702";
+const clientUrl = "http://localhost:44602";
+
+// Authorization code flow with PKCE; endpoints come from the authority's discovery document.
 export const IdentityConfig = {
-  userStore: new Oidc.WebStorageStateStore({ store: window.localStorage }),
-    authority: "https://localhost:44701/",
+  authority: identityServerUrl,
   client_id: "client_id_react",
-  response_type: "id_token token",
-    redirect_uri: "http://localhost:44602/signincallback",
-    post_logout_redirect_uri: "http://localhost:44602/signoutcallback",
-  scope: "openid  profile ApiOne ApiTwo StockAPI",
-  metadata: {
-      issuer: "https://localhost:44701",
-      jwks_uri: "https://localhost:44701/.well-known/openid-configuration/jwks",
-      authorization_endpoint: "https://localhost:44701/connect/authorize",
-      token_endpoint: "https://localhost:44701/connect/token",
-      userinfo_endpoint: "https://localhost:44701/connect/userinfo",
-      end_session_endpoint: "https://localhost:44701/connect/endsession",
-      check_session_iframe: "https://localhost:44701/connect/checksession",
-      revocation_endpoint: "https://localhost:44701/connect/revocation",
-      introspection_endpoint: "https://localhost:44701/connect/introspect",
-    device_authorization_endpoint:
-      "https://localhost:44701/connect/deviceauthorization",
-  },
+  response_type: "code",
+  redirect_uri: `${clientUrl}/signincallback`,
+  post_logout_redirect_uri: `${clientUrl}/signoutcallback`,
+  scope: "openid profile StockAPI",
+  userStore: new WebStorageStateStore({ store: window.localStorage }),
+  // oidc-client-ts renews tokens in a hidden iframe by default. The app has no
+  // silent-renew callback page, so keep the old oidc-client behaviour (off).
+  automaticSilentRenew: false,
 };
 
+export const signUpUrl = `${identityServerUrl}/Auth/Register?returnUrl=${encodeURIComponent(`${clientUrl}/`)}`;
+
 export const StockAPIConfig = {
-    baseURL: "http://localhost:44700/api/",
+  baseURL: "http://localhost:44700/api/",
 };

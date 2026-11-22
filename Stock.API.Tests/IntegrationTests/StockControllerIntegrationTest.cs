@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using DTOs = Stock.Models;
@@ -27,50 +28,50 @@ namespace Stock.API.Tests.IntegrationTests
         public async Task Get_NoArgument_ReturnsStockCollection()
         {
             //Arrange
-            var client = _Factory.CreateClient();
-            var server = _Factory.Server;
+            var client = _Factory.CreateClient().WithAccessToken(TestTokens.StockApiScope);
+
             //Act
-            var response = await client.GetAsync(url);
-            var jsonString = await response.Content.ReadAsStringAsync();
+            var response = await client.GetAsync(url, TestContext.Current.CancellationToken);
+            var jsonString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
             var stocks = JsonConvert.DeserializeObject<List<DTOs.Stock>>(jsonString);
 
             //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(stocks);
-            Assert.NotEmpty(stocks);
+            Assert.Equal(2, stocks.Count);
         }
 
         [Theory]
-        [InlineData(1)]
-        [InlineData(2)]
-        public async Task Get_ValidStockId_ReturnsStock(int stockId)
+        [InlineData(Utilities.Microsoft, 85)]
+        [InlineData(Utilities.Google, 105)]
+        public async Task Get_ValidStockId_ReturnsStock(string stockId, double price)
         {
             //Arrange
-            var client = _Factory.CreateClient();
+            var client = _Factory.CreateClient().WithAccessToken(TestTokens.StockApiScope);
 
             //Act
-            var response = await client.GetAsync(url + stockId);
-            var jsonString = await response.Content.ReadAsStringAsync();
+            var response = await client.GetAsync(url + stockId, TestContext.Current.CancellationToken);
+            var jsonString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
             var stock = JsonConvert.DeserializeObject<DTOs.Stock>(jsonString);
 
             //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(stock);
-            Assert.Equal(stockId, stock.Id);
+            Assert.Equal(stockId, stock.StockId);
+            Assert.Equal(price, stock.Price);
         }
 
-        [Theory]
-        [InlineData(1098)]
-        public async Task Get_InvalidStockId_ReturnsNull(int stockId)
+        [Fact]
+        public async Task Get_UnknownStockId_ReturnsNotFound()
         {
             //Arrange
-            var client = _Factory.CreateClient();
+            var client = _Factory.CreateClient().WithAccessToken(TestTokens.StockApiScope);
 
             //Act
-            var response = await client.GetAsync(url + stockId);
-            var jsonString = await response.Content.ReadAsStringAsync();
-            var stock = JsonConvert.DeserializeObject<DTOs.Stock>(jsonString);
+            var response = await client.GetAsync(url + "Unknown", TestContext.Current.CancellationToken);
 
             //Assert
-            Assert.Null(stock);
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         #endregion

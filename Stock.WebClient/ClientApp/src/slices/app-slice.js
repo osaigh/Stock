@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 export const appSlice = createSlice({
   name: "app",
@@ -7,10 +7,7 @@ export const appSlice = createSlice({
   },
   reducers: {
     toggleScreen: (state, action) => {
-      const newState = { ...state };
-      newState.screen = action.payload;
-
-      return newState;
+      state.screen = action.payload;
     },
   },
 });

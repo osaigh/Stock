@@ -1,4 +1,4 @@
-﻿using Prism.Events;
+using Prism.Events;
 using Prism.Mvvm;
 using Stock.APIClient.API;
 using Stock.WpfClient.Common.Events;
@@ -7,8 +7,10 @@ using Stock.WpfClient.Surveillance.Charts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -28,8 +30,10 @@ namespace Stock.WpfClient.Surveillance.ViewModels
         protected StockAPIClient _stockApiClient ;
         protected readonly IEventAggregator _EventAggregator;
         protected readonly IAuthenticationService _AuthenticationService;
-        protected bool _keepRunning = false;
-        object objLock = "lock";
+        protected CancellationTokenSource _marketUpdatesCancellation;
+        //True while the list of positions is being replaced with fresh data, so the selection changes
+        //caused by the refresh itself are not treated as the user selecting a stock
+        private bool _isRefreshingStockPositions = false;
         #endregion
 
         #region Properties
@@ -138,7 +142,7 @@ namespace Stock.WpfClient.Surveillance.ViewModels
             {
                 if (SetProperty(ref _selectedStock, value))
                 {
-                    if (_selectedStock != null)
+                    if (_selectedStock != null && !_isRefreshingStockPositions)
                     {
                         OnSelectedStock();
                     }
@@ -170,53 +174,88 @@ namespace Stock.WpfClient.Surveillance.ViewModels
 
         protected void StartReceivingMarketUpdates()
         {
+            StopReceivingMarketUpdates();
+
             //Create api client
             _stockApiClient = new StockAPIClient(_baseURL, _identityServerUrl, _clientId, _clientSecret, _scope);
 
-            _keepRunning = true;
-            Task.Run(async () => {
-                while (true)
+            var cancellationTokenSource = new CancellationTokenSource();
+            _marketUpdatesCancellation = cancellationTokenSource;
+            Task.Run(() => ReceiveMarketUpdates(cancellationTokenSource.Token));
+        }
+
+        protected async Task ReceiveMarketUpdates(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
                 {
-                    lock (objLock)
+                    var user = _AuthenticationService.GetUserIdentity();
+                    if (user != null)
                     {
-                        if (_keepRunning)
+                        var stockPositions = await _stockApiClient.GetStockPositions(user.AccessToken);
+                        if (stockPositions != null && !cancellationToken.IsCancellationRequested)
                         {
-                            var user = _AuthenticationService.GetUserIdentity();
-                            var stockPositions = _stockApiClient.GetStockPositions(user.AccessToken).GetAwaiter().GetResult();
                             Application.Current.Dispatcher.Invoke(_OnStockUpdateDelegate, stockPositions);
                         }
-                        else
-                        {
-                            break;
-                        }
                     }
-
-                    await Task.Delay(3000);
                 }
-            });
+                catch (Exception ex)
+                {
+                    //The API may be unavailable for a moment. Try again on the next update.
+                    Debug.WriteLine(ex);
+                }
 
+                try
+                {
+                    await Task.Delay(3000, cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+            }
         }
 
         protected void StopReceivingMarketUpdates()
         {
-            lock (objLock)
+            _marketUpdatesCancellation?.Cancel();
+            _marketUpdatesCancellation = null;
+        }
+
+        protected async void OnSelectedStock()
+        {
+            try
             {
-                _keepRunning = false;
+                await ShowStockHistory(_selectedStock);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
             }
         }
 
-        protected async Task OnSelectedStock()
+        protected async Task ShowStockHistory(DTOStockPosition stockPosition)
         {
-            this.ChartVisibility = Visibility.Visible;
-            
+            var user = _AuthenticationService.GetUserIdentity();
+            if (stockPosition == null || user == null)
+            {
+                return;
+            }
+
             //get the stock Id
-            string stockId = _selectedStock.StockId;
-            string name = _selectedStock.StockId;
+            string stockId = stockPosition.StockId;
+            string name = stockPosition.StockId;
             
             //call the api to get the stockhistory data
             var stockApiClient = new StockAPIClient(_baseURL, _identityServerUrl, _clientId, _clientSecret, _scope);
-            var user = _AuthenticationService.GetUserIdentity();
             var stockHistoryCollection = await stockApiClient.GetStockHistory(stockId, user.AccessToken);
+            if (stockHistoryCollection == null || stockHistoryCollection.Count == 0)
+            {
+                return;
+            }
+
+            this.ChartVisibility = Visibility.Visible;
 
             //create a dataseries for the chart
             DataSeries ds = new DataSeries();
@@ -283,20 +322,30 @@ namespace Stock.WpfClient.Surveillance.ViewModels
 
         protected void OnStockUpdate(IEnumerable<DTOStockPosition> stockPositions)
         {
-            this.StockPositions.Clear();
-            foreach (var stockPosition in stockPositions)
+            //Replacing the items clears the selection in the view, so remember it and put it back afterwards
+            string selectedStockId = _selectedStock?.StockId;
+            _isRefreshingStockPositions = true;
+            try
             {
-                var stockPositionModel = new DTOStockPosition()
+                this.StockPositions.Clear();
+                foreach (var stockPosition in stockPositions)
                 {
-                    StockId = stockPosition.StockId,
-                    CurrentPrice = Math.Round(stockPosition.CurrentPrice,2),
-                    CostBasis = Math.Round(stockPosition.CostBasis, 2),
-                    Shares = stockPosition.Shares,
-                };
-                this.StockPositions.Add(stockPositionModel);
+                    var stockPositionModel = new DTOStockPosition()
+                    {
+                        StockId = stockPosition.StockId,
+                        CurrentPrice = Math.Round(stockPosition.CurrentPrice,2),
+                        CostBasis = Math.Round(stockPosition.CostBasis, 2),
+                        Shares = stockPosition.Shares,
+                    };
+                    this.StockPositions.Add(stockPositionModel);
+                }
+
+                this.SelectedStock = selectedStockId == null ? null : this.StockPositions.FirstOrDefault(s => s.StockId == selectedStockId);
             }
-            
-            this.OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("StockPositions"));
+            finally
+            {
+                _isRefreshingStockPositions = false;
+            }
         }
         #endregion
     }

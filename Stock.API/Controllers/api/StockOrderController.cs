@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Stock.API.Data;
+using Stock.API.Models;
 using Stock.API.Repository;
 using ApiRequest = Stock.Models.ApiRequest;
 using DAOStockOrder = Stock.API.Models.StockOrder;
@@ -25,16 +21,12 @@ namespace Stock.API.Controllers.api
         #region Fields
 
         private readonly IRepository<DAOStockOrder> _StockOrderRepository;
-        private readonly IMapper _Mapper;
         #endregion
 
         #region Constructor
-        public StockOrderController(
-            IRepository<DAOStockOrder> stockOrderRepository,
-            IMapper mapper)
+        public StockOrderController(IRepository<DAOStockOrder> stockOrderRepository)
         {
             _StockOrderRepository = stockOrderRepository;
-            _Mapper = mapper;
         }
         #endregion
 
@@ -45,31 +37,28 @@ namespace Stock.API.Controllers.api
         {
             var daoStockOrders = await _StockOrderRepository.GetAllAsync();
 
-            var dtoStockOrders = _Mapper.Map<List<DTOStockOrder>>(daoStockOrders);
-
-            return Ok(dtoStockOrders); ;
+            return Ok(daoStockOrders.ToDtos());
         }
 
-        [HttpGet("{stockId}")]
+        [HttpGet("{stockOrderId}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(DTOStockOrder), (int)(HttpStatusCode.OK))]
-        public async Task<ActionResult<DTOStockOrder>> Get(string stockId)
+        public async Task<ActionResult<DTOStockOrder>> Get(string stockOrderId)
         {
-            if (string.IsNullOrEmpty(stockId))
+            if (!int.TryParse(stockOrderId, out int id))
             {
-                return new BadRequestObjectResult("stockId is null");
+                return new BadRequestObjectResult("stockOrderId is not valid");
             }
 
-            var daoStockOrder = await _StockOrderRepository.GetAsync(stockId);
+            var daoStockOrder = await _StockOrderRepository.GetAsync(id);
 
             if (daoStockOrder == null)
             {
-                return new BadRequestObjectResult(string.Format("No Stock with Id ", stockId));
+                return NotFound($"No Stock Order with Id {id}");
             }
 
-            var dtoStockOrder = _Mapper.Map<DTOStockOrder>(daoStockOrder);
-
-            return dtoStockOrder;
+            return Ok(daoStockOrder.ToDto());
         }
 
         [HttpPost]
@@ -82,26 +71,35 @@ namespace Stock.API.Controllers.api
                 return new BadRequestObjectResult("JsonString is empty");
             }
 
-            DTOStockOrder dtoStockOrder = JsonConvert.DeserializeObject<DTOStockOrder>(apiRequest.JsonString);
-            
+            DTOStockOrder dtoStockOrder;
+            try
+            {
+                dtoStockOrder = JsonConvert.DeserializeObject<DTOStockOrder>(apiRequest.JsonString);
+            }
+            catch (JsonException)
+            {
+                return new BadRequestObjectResult("JsonString is not a valid Stock Order");
+            }
+
             //validate input
             if (dtoStockOrder == null || string.IsNullOrEmpty(dtoStockOrder.StockId))
             {
                 return new BadRequestObjectResult("StockId is required");
             }
 
-            //Add
-            DAOStockOrder daoStockOrder = _Mapper.Map<DAOStockOrder>(dtoStockOrder);
-            daoStockOrder.StockId = dtoStockOrder.StockId;
-            daoStockOrder = await _StockOrderRepository.AddAsync(daoStockOrder);
-            if (daoStockOrder == null)
+            if (dtoStockOrder.Shares <= 0)
             {
-                return new BadRequestObjectResult(string.Format("Something went wrong when placing the order."));
+                return new BadRequestObjectResult("Shares must be greater than zero");
             }
 
-            dtoStockOrder = _Mapper.Map<DTOStockOrder>(daoStockOrder);
+            //Add
+            DAOStockOrder daoStockOrder = await _StockOrderRepository.AddAsync(dtoStockOrder.ToEntity());
+            if (daoStockOrder == null)
+            {
+                return new BadRequestObjectResult($"No Stock with Id {dtoStockOrder.StockId}");
+            }
 
-            return Ok(dtoStockOrder);
+            return Ok(daoStockOrder.ToDto());
         }
 
        

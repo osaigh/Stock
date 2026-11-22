@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using IdentityServer4.Services;
+using Duende.IdentityModel;
+using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -41,15 +43,10 @@ namespace Stock.IdentityServer.Controllers
         [HttpGet]
         public async Task<IActionResult> Login(string returnUrl)
         {
-            var externalProviders = await _signInManager.GetExternalAuthenticationSchemesAsync();
-            if (externalProviders == null)
-            {
-                externalProviders = new List<AuthenticationScheme>();
-            }
             var loginViewModel = new LoginViewModel()
                                  {
                                      ReturnUrl = returnUrl,
-                                     ExternalProviders = externalProviders
+                                     ExternalProviders = await GetExternalProvidersAsync()
                                  };
             return View(loginViewModel);
         }
@@ -60,18 +57,26 @@ namespace Stock.IdentityServer.Controllers
         /// <param name="loginViewModel"></param>
         /// <returns></returns>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
-            var result = await _signInManager.PasswordSignInAsync(loginViewModel.Username, loginViewModel.Password, false, false);
-
-            if (result.Succeeded)
+            if (ModelState.IsValid)
             {
-                return Redirect(loginViewModel.ReturnUrl);
+                var result = await _signInManager.PasswordSignInAsync(loginViewModel.Username, loginViewModel.Password, false, false);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToReturnUrl(loginViewModel.ReturnUrl);
+                }
+
+                ModelState.AddModelError(string.Empty, "Invalid username or password");
             }
 
-            return View();
+            loginViewModel.ExternalProviders = await GetExternalProvidersAsync();
+            return View(loginViewModel);
         }
 
+        [HttpGet]
         public IActionResult Register(string returnUrl)
         {
             var registerViewModel = new RegisterViewModel()
@@ -88,6 +93,7 @@ namespace Stock.IdentityServer.Controllers
         /// <param name="registerViewModel"></param>
         /// <returns></returns>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
             if (!ModelState.IsValid)
@@ -106,11 +112,17 @@ namespace Stock.IdentityServer.Controllers
 
             if (result.Succeeded)
             { 
+                await _userManager.AddClaimsAsync(user, GetNameClaims(user));
                 await _signInManager.SignInAsync(user, false);
-                return Redirect(registerViewModel.ReturnUrl);
+                return RedirectToReturnUrl(registerViewModel.ReturnUrl);
             }
 
-            return View();
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(registerViewModel);
         }
 
         /// <summary>
@@ -121,10 +133,10 @@ namespace Stock.IdentityServer.Controllers
         public async Task<IActionResult> Logout(string logoutId)
         {
             await _signInManager.SignOutAsync();
-            var logoutRequest = await _identityServerInteractionService.GetLogoutContextAsync(logoutId);
+            var logoutRequest = await _identityServerInteractionService.GetLogoutContextAsync(logoutId, HttpContext.RequestAborted);
             
 
-            if (string.IsNullOrEmpty(logoutRequest.PostLogoutRedirectUri))
+            if (string.IsNullOrEmpty(logoutRequest?.PostLogoutRedirectUri))
             {
                 return RedirectToAction("Login", "Auth");
             }
@@ -133,7 +145,8 @@ namespace Stock.IdentityServer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ExternalLogin(string provider ,string returnUrl)
+        [ValidateAntiForgeryToken]
+        public IActionResult ExternalLogin(string provider ,string returnUrl)
         {
             var redirectUri = Url.Action(nameof(ExternalLoginCallback), "Auth", new {returnUrl});
             var externalAuthProperties = _signInManager.ConfigureExternalAuthenticationProperties(provider,redirectUri);
@@ -147,7 +160,7 @@ namespace Stock.IdentityServer.Controllers
             //Nothing happened
             if (info == null)
             {
-                return RedirectToAction("Login");
+                return RedirectToAction("Login", new { returnUrl });
             }
 
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider,info.ProviderKey,false);
@@ -155,10 +168,61 @@ namespace Stock.IdentityServer.Controllers
             ///To be continued
             if (result.Succeeded)
             {
-                return Redirect(returnUrl);
+                return RedirectToReturnUrl(returnUrl);
             }
 
-            return null;
+            return RedirectToAction("Login", new { returnUrl });
+        }
+
+        /// <summary>
+        /// The given_name and family_name claims that are issued with the profile scope
+        /// </summary>
+        public static IEnumerable<Claim> GetNameClaims(ApplicationUser user)
+        {
+            var claims = new List<Claim>();
+
+            if (!string.IsNullOrEmpty(user.FirstName))
+            {
+                claims.Add(new Claim(JwtClaimTypes.GivenName, user.FirstName));
+            }
+
+            if (!string.IsNullOrEmpty(user.LastName))
+            {
+                claims.Add(new Claim(JwtClaimTypes.FamilyName, user.LastName));
+            }
+
+            return claims;
+        }
+
+        private async Task<IEnumerable<AuthenticationScheme>> GetExternalProvidersAsync()
+        {
+            return await _signInManager.GetExternalAuthenticationSchemesAsync() ?? new List<AuthenticationScheme>();
+        }
+
+        /// <summary>
+        /// Redirects to the return url when it is safe to do so: either a local url (for example the
+        /// authorize callback of a sign in that is in progress) or a url of one of the registered clients.
+        /// Anything else goes to the home page, so the server cannot be used as an open redirect.
+        /// </summary>
+        private IActionResult RedirectToReturnUrl(string returnUrl)
+        {
+            if (!string.IsNullOrEmpty(returnUrl))
+            {
+                if (Url.IsLocalUrl(returnUrl) || _identityServerInteractionService.IsValidReturnUrl(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
+
+                if (Uri.TryCreate(returnUrl, UriKind.Absolute, out Uri uri)
+                    && Configuration.GetClients()
+                                    .SelectMany(client => client.AllowedCorsOrigins)
+                                    .Contains(uri.GetLeftPart(UriPartial.Authority), StringComparer.OrdinalIgnoreCase))
+                {
+                    return Redirect(returnUrl);
+                }
+            }
+
+            return RedirectToAction("Index", "Home");
         }
         #endregion
     }

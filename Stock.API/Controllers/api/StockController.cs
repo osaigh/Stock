@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Stock.API.Models;
 using Stock.API.Repository;
 using DAOStock = Stock.API.Models.Stock;
 using DTOStock = Stock.Models.Stock;
@@ -22,16 +19,12 @@ namespace Stock.API.Controllers.api
         #region Fields
 
         private readonly IRepository<DAOStock> _StockRepository;
-        private readonly IMapper _Mapper;
         #endregion
 
         #region Constructor
-        public StockController(
-            IRepository<DAOStock> stockRepository,
-            IMapper mapper)
+        public StockController(IRepository<DAOStock> stockRepository)
         {
             _StockRepository = stockRepository;
-            _Mapper = mapper;
         }
         #endregion
 
@@ -41,32 +34,29 @@ namespace Stock.API.Controllers.api
         public async Task<ActionResult<IEnumerable<DTOStock>>> Get()
         {
             var daoStocks = await _StockRepository.GetAllAsync();
-            
-            var dtoStocks = _Mapper.Map<List<DTOStock>>(daoStocks);
 
-            return Ok(dtoStocks);
+            return Ok(daoStocks.ToDtos());
         }
 
         [HttpGet("{stockId}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(DTOStock), (int)(HttpStatusCode.OK))]
         public async Task<ActionResult<DTOStock>> Get(string stockId)
         {
             if (string.IsNullOrEmpty(stockId))
             {
-                return new BadRequestObjectResult("stockId is is not valid");
+                return new BadRequestObjectResult("stockId is not valid");
             }
 
             var daoStock = await _StockRepository.GetAsync(stockId);
 
             if (daoStock == null)
             {
-                return null;
+                return NotFound($"No Stock with Id {stockId}");
             }
 
-            var dtoStock= _Mapper.Map<DTOStock>(daoStock);
-
-            return Ok(dtoStock);
+            return Ok(daoStock.ToDto());
         }
 
         #endregion

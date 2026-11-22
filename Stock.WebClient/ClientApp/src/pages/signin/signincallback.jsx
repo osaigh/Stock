@@ -1,32 +1,28 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { Navigate } from "react-router-dom";
 import { UserAuthenticationContext } from "../../context/user-manager-context";
 
 export function SignInCallback() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const { userAuthenticationService } = useContext(UserAuthenticationContext);
-  const navigate = useNavigate();
+
   useEffect(() => {
-    async function getUserAsync() {
-      const user = await userAuthenticationService.getUser();
-    }
+    let active = true;
 
-    const handler = () => {
+    // On failure "/" sends the still signed-out user back to the login page.
+    userAuthenticationService
+      .signinRedirectCallback()
+      .catch((error) => console.error(error))
+      .then(() => {
+        if (active) {
+          setIsRedirecting(true);
+        }
+      });
 
-      setIsRedirecting(true);
+    return () => {
+      active = false;
     };
+  }, [userAuthenticationService]);
 
-    async function signinasync() {
-      await userAuthenticationService
-        .signinRedirectCallback()
-        .then(handler)
-        .catch(function (e) {
-          console.error(e);
-        });
-    }
-
-    signinasync();
-  }, [navigate]);
-  console.log("In Signincallback: isRedirecting is " + isRedirecting);
-  return isRedirecting ? <Navigate to="/" /> : <div>Redirecting</div>;
+  return isRedirecting ? <Navigate to="/" replace /> : <div>Redirecting</div>;
 }

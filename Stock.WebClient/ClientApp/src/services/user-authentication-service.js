@@ -1,70 +1,48 @@
-import { UserManager, Log } from "oidc-client";
-import { IdentityConfig } from "../configuration/config";
+import { UserManager } from "oidc-client-ts";
+import { IdentityConfig, signUpUrl } from "../configuration/config";
 
 export default class UserAuthenticationService {
-  UserManager;
-  currentuser;
+  userManager;
+  signinCallbackPromise = null;
+  signoutCallbackPromise = null;
 
   constructor() {
-    this.UserManager = new UserManager(IdentityConfig);
-    Log.logger = console;
-    Log.level = Log.DEBUG;
-    this.currentuser = null;
-    this.UserManager.events.addUserLoaded(this.userLoadedListener);
-    this.UserManager.events.addUserUnloaded(this.userUnloadedListener);
-    this.UserManager.events.addUserSignedOut(this.userSignedOutListener);
+    this.userManager = new UserManager(IdentityConfig);
   }
 
-  signIn = function () {
-    //alert("SignIn called");
-    this.UserManager.signinRedirect();
+  signIn = () => {
+    return this.userManager.signinRedirect();
   };
 
-  signOut = function () {
-    //alert("SignOut called");
-    this.currentuser = null;
-    this.UserManager.signoutRedirect();
+  signOut = () => {
+    return this.userManager.signoutRedirect();
   };
 
-  userLoadedListener = (user) => {
-    console.log("User signed in");
-    this.currentuser = user;
-  };
-
-  userUnloadedListener = () => {
-    console.log("userUnloadedListener User signed out");
-    this.currentuser = null;
-  };
-
-  userSignedOutListener = () => {
-    this.currentuser = null;
-    console.log("userSignedOutListener User signed out");
-  };
-
+  // Resolves to the signed-in user, or null when nobody is signed in or the
+  // access token has expired.
   getUser = async () => {
-    const user = await this.UserManager.getUser();
-    this.currentuser = user;
-    return user;
-    };
-
-  getUserIdentity = async () => {
-      const user = await this.UserManager.getUser();
-      return user;
+    const user = await this.userManager.getUser();
+    return user && !user.expired ? user : null;
   };
 
-  signinRedirectCallback = async () => {
-    await this.UserManager.signinRedirectCallback();
+  // The authorization code in the callback URL can only be redeemed once, so
+  // repeated calls (React StrictMode runs effects twice in development) share
+  // one request.
+  signinRedirectCallback = () => {
+    if (!this.signinCallbackPromise) {
+      this.signinCallbackPromise = this.userManager.signinRedirectCallback();
+    }
+    return this.signinCallbackPromise;
   };
 
-  signoutRedirectCallback = async () => {
-    await this.UserManager.signoutRedirectCallback();
+  signoutRedirectCallback = () => {
+    if (!this.signoutCallbackPromise) {
+      this.signoutCallbackPromise = this.userManager.signoutRedirectCallback();
+    }
+    return this.signoutCallbackPromise;
   };
 
-  getCurrentUser() {
-    return this.currentuser;
-  }
-
-  getSignUpEndPoint(){
-    return `${IdentityConfig.authority}auth/register`;
+  getSignUpEndPoint() {
+    return signUpUrl;
   }
 }

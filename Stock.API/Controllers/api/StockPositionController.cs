@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Stock.API.Models;
 using Stock.API.Repository;
-using ApiRequest = Stock.Models.ApiRequest;
 using DAOStockPosition = Stock.API.Models.StockPosition;
 using DTOStockPosition = Stock.Models.StockPosition;
 
@@ -22,16 +16,12 @@ namespace Stock.API.Controllers.api
     {
         #region Fields
         private readonly IRepository<DAOStockPosition> _StockPositionRepository;
-        private readonly IMapper _Mapper;
         #endregion
 
         #region Constructor
-        public StockPositionController(
-            IRepository<DAOStockPosition> stockPositionRepository,
-            IMapper mapper)
+        public StockPositionController(IRepository<DAOStockPosition> stockPositionRepository)
         {
             _StockPositionRepository = stockPositionRepository;
-            _Mapper = mapper;
         }
         #endregion
 
@@ -42,9 +32,7 @@ namespace Stock.API.Controllers.api
         {
             var daoStockPositions = await _StockPositionRepository.GetAllAsync();
 
-            var dtoStockPositions = _Mapper.Map<List<DTOStockPosition>>(daoStockPositions.ToList());
-
-            return Ok(dtoStockPositions);
+            return Ok(daoStockPositions.ToDtos());
         }
 
        

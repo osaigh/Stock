@@ -14,12 +14,9 @@ namespace Stock.IdentityServer.Extensions
         public static class SameSiteCookiesServiceCollectionExtensions
         {
             /// <summary>
-            /// -1 defines the unspecified value, which tells ASPNET Core to NOT
-            /// send the SameSite attribute. With ASPNET Core 3.1 the
-            /// <seealso cref="SameSiteMode" /> enum will have a definition for
-            /// Unspecified.
+            /// The unspecified value tells ASPNET Core to NOT send the SameSite attribute.
             /// </summary>
-            private const SameSiteMode Unspecified = (SameSiteMode.None);
+            private const SameSiteMode Unspecified = SameSiteMode.Unspecified;
 
             /// <summary>
             /// Configures a cookie policy to properly set the SameSite attribute

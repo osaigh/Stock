@@ -35,7 +35,7 @@ namespace Stock.API.Data
                         .HasKey(s => s.StockHistoryId);
 
             modelBuilder.Entity<StockHistory>()
-                        .HasOne<Models.Stock>()
+                        .HasOne<Models.Stock>(s => s.Stock)
                         .WithMany(s => s.StockHistories)
                         .HasForeignKey(s => s.StockId);
 

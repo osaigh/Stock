@@ -1,285 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Stock.API.Data;
 using Stock.API.Models;
-using Stock.API.Repository;
+using OrderType = Stock.Models.OrderType;
+using TimeInForce = Stock.Models.TimeInForce;
+using TransactionType = Stock.Models.TransactionType;
 
 namespace Stock.API.Tests
 {
     public static class Utilities
     {
-        #region snippet1
+        public const string Microsoft = "Microsoft";
+        public const string Google = "Google";
+
         public static void InitializeDbForTests(StockDbContext db)
         {
-            //Stocks
-            List<Models.Stock> stocks = new List<Models.Stock>();
-            var stock1 = new Models.Stock()
-                         {
-                             Id = 1, 
-                             Name = "Microsoft",
-                             Price = 85.0,
-                             Volume = 1000,
-
-                         };
-
-            var stock2 = new Models.Stock()
-                         {
-                             Id = 2,
-                             Name = "Google",
-                             Price = 135.0,
-                             Volume = 1300,
-
-                         };
-            stocks.Add(stock1);
-            stocks.Add(stock2);
-
-
-            //Stock Histories
-            List<StockHistory> stockHistories = new List<StockHistory>();
-            var stockHistory1 = new Models.StockHistory()
-                         {
-                             Id = 1,
-                             StockId = 1,
-                             Date = new DateTimeOffset(new DateTime(2018, 12, 02)),
-                             Price = 45
-            };
-
-            var stockHistory2 = new Models.StockHistory()
-                                {
-                                    Id = 2,
-                                    StockId = 1,
-                                    Date = new DateTimeOffset(new DateTime(2019, 12, 02)),
-                                    Price = 65
-            };
-
-            var stockHistory3 = new Models.StockHistory()
-                                {
-                                    Id = 3,
-                                    StockId = 1,
-                                    Date = new DateTimeOffset(new DateTime(2020, 12, 02)),
-                                    Price = 70
-                                };
-
-            var stockHistory4 = new Models.StockHistory()
-                                {
-                                    Id = 4,
-                                    StockId = 2,
-                                    Date = new DateTimeOffset(new DateTime(2019, 12, 02)),
-                                    Price = 100
-                                };
-
-            var stockHistory5 = new Models.StockHistory()
-                                {
-                                    Id = 5,
-                                    StockId = 2,
-                                    Date = new DateTimeOffset(new DateTime(2020, 12, 02)),
-                                    Price = 120
-                                };
-
-            stockHistories.Add(stockHistory1);
-            stockHistories.Add(stockHistory2);
-            stockHistories.Add(stockHistory3);
-            stockHistories.Add(stockHistory4);
-            stockHistories.Add(stockHistory5);
-
-            //Stockholders
-            List<StockHolder> stockHolders = new List<StockHolder>();
-
-            var jimmy = new StockHolder()
-                        {
-                            Username = "Jimmy", Email = "jimmy@tlink.com",
-                        };
-            stockHolders.Add(jimmy);
-
-            var priel = new StockHolder()
-                        {
-                            Username = "Priel", Email = "priel@tyebank.com",
-                        };
-            stockHolders.Add(priel);
-
-            var steve = new StockHolder()
-                        {
-                            Username = "Steve", Email = "steve@yahoo.com",
-                        };
-
-            stockHolders.Add(steve);
-
-
-            //StockholderPositions
-            List<StockHolderPosition> stockHolderPositions = new List<StockHolderPosition>();
-            stockHolderPositions.Add(new StockHolderPosition()
-                                     {
-                                         Id = 1,
-                                         StockHolderId = jimmy.Username,
-                                         StockHolder = jimmy,
-                                         CostBasis = 280.99,
-                                         Shares = 10,
-                                         StockId = 1,
-                                     });
-            stockHolderPositions.Add(new StockHolderPosition()
-                                     {
-                                         Id=2,
-                                         StockHolderId = jimmy.Username,
-                                         StockHolder = jimmy,
-                                         CostBasis = 1900.22,
-                                         Shares = 100,
-                                         StockId = 1,
-            });
-            stockHolderPositions.Add(new StockHolderPosition()
-                                     {
-                                         Id =3,
-                                         StockHolderId = jimmy.Username,
-                                         StockHolder = jimmy,
-                                         CostBasis = 1900.22,
-                                         Shares = 100,
-                                         StockId = 1,
-            });
-            stockHolderPositions.Add(new StockHolderPosition()
-                                     {
-                                         Id = 4,
-                                         StockHolderId = priel.Username,
-                                         StockHolder = priel,
-                                         CostBasis = 234,
-                                         Shares = 25,
-                                         StockId = 1,
-            });
-            stockHolderPositions.Add(new StockHolderPosition()
-                                     {
-                                         Id = 5,
-                                         StockHolderId = steve.Username,
-                                         StockHolder = steve,
-                                         CostBasis = 523.43,
-                                         Shares = 50,
-                                         StockId = 1,
-            });
-
-
-            db.Stocks.AddRange(stocks);
-            db.StockHistories.AddRange(stockHistories);
-            db.StockHolders.AddRange(stockHolders);
-            db.StockHolderPositions.AddRange(stockHolderPositions);
-
+            db.Stocks.AddRange(GetTestStocks());
+            db.StockHistories.AddRange(GetTestStockHistories());
+            db.StockPositions.AddRange(GetTestStockPositions());
+            db.StockOrders.AddRange(GetTestStockOrders());
 
             db.SaveChanges();
-
         }
 
         public static List<Models.Stock> GetTestStocks()
         {
-            List<Models.Stock> stocks = new List<Models.Stock>();
-            stocks.Add(new Models.Stock()
-                       {
-                           Id = 1,
-                           Name = "Microsoft",
-                           Volume = 1000,
-                           Price = 85
-                       });
-            stocks.Add(new Models.Stock()
-                       {
-                           Id = 2,
-                           Name = "Google",
-                           Volume = 1300,
-                           Price = 105
-                       });
-
-
-            return stocks;
+            return new List<Models.Stock>()
+                   {
+                       new Models.Stock() { StockId = Microsoft, Price = 85 },
+                       new Models.Stock() { StockId = Google, Price = 105 },
+                   };
         }
 
+        /// <summary>
+        /// The histories are deliberately not in date order, so the tests can check that the API sorts them
+        /// </summary>
         public static List<StockHistory> GetTestStockHistories()
         {
-            List<StockHistory> stockHistories = new List<StockHistory>();
-            stockHistories.Add(new StockHistory()
-                             {
-                                 Id=1,
-                                 StockId =1,
-                                 Date = new DateTimeOffset(new DateTime(2018,12,02)),
-                                 Price = 45
-                             });
-            stockHistories.Add(new StockHistory()
-                             {
-                                 Id = 2,
-                                StockId = 1,
-                                Date = new DateTimeOffset(new DateTime(2019, 12, 02)),
-                                Price = 25
-                            });
-            stockHistories.Add(new StockHistory()
-                             {
-                                 Id = 3,
-                                StockId = 1,
-                                Date = new DateTimeOffset(new DateTime(2020, 12, 02)),
-                                Price = 37
-                            });
-
-
-            return stockHistories;
+            return new List<StockHistory>()
+                   {
+                       new StockHistory() { StockHistoryId = 1, StockId = Microsoft, Date = new DateTimeOffset(2020, 12, 2, 0, 0, 0, TimeSpan.Zero), Price = 70 },
+                       new StockHistory() { StockHistoryId = 2, StockId = Microsoft, Date = new DateTimeOffset(2018, 12, 2, 0, 0, 0, TimeSpan.Zero), Price = 45 },
+                       new StockHistory() { StockHistoryId = 3, StockId = Microsoft, Date = new DateTimeOffset(2019, 12, 2, 0, 0, 0, TimeSpan.Zero), Price = 65 },
+                       new StockHistory() { StockHistoryId = 4, StockId = Google, Date = new DateTimeOffset(2019, 12, 2, 0, 0, 0, TimeSpan.Zero), Price = 100 },
+                       new StockHistory() { StockHistoryId = 5, StockId = Google, Date = new DateTimeOffset(2020, 12, 2, 0, 0, 0, TimeSpan.Zero), Price = 120 },
+                   };
         }
 
-        public static List<StockHolder> GetTestStockHolders()
+        public static List<StockPosition> GetTestStockPositions()
         {
-            List<StockHolder> stockHolders = new List<StockHolder>();
-            stockHolders.Add(new StockHolder()
-                             {
-                                 Username = "Jimmy",
-                                 Email = "jimmy@tlink.com",
-                             });
-            stockHolders.Add(new StockHolder()
-                             {
-                                 Username = "Priel",
-                                 Email = "priel@tyebank.com",
-                             });
-            stockHolders.Add(new StockHolder()
-                             {
-                                 Username = "Steve",
-                                 Email = "steve@yahoo.com",
-                             });
-
-
-            return stockHolders;
+            return new List<StockPosition>()
+                   {
+                       new StockPosition() { StockPositionId = 1, StockId = Microsoft, Shares = 10, CostBasis = 800 },
+                       new StockPosition() { StockPositionId = 2, StockId = Google, Shares = 20, CostBasis = 2000 },
+                   };
         }
 
-        public static List<StockHolderPosition> GetTestStockHolderPositions()
+        public static List<StockOrder> GetTestStockOrders()
         {
-            List<StockHolderPosition> stockHolderPositions = new List<StockHolderPosition>();
-            stockHolderPositions.Add(new StockHolderPosition()
-                                     {
-                                         StockHolderId = "Jimmy",
-                                         CostBasis = 280.99,
-                                         Shares = 10,
-                                         StockId = 1
-                                     });
-            stockHolderPositions.Add(new StockHolderPosition()
-                                     {
-                                         StockHolderId = "Jimmy",
-                                         CostBasis = 1900.22,
-                                         Shares = 100,
-                                         StockId = 1
-            });
-            stockHolderPositions.Add(new StockHolderPosition()
-                                     {
-                                         StockHolderId = "Jimmy",
-                                         CostBasis = 1900.22,
-                                         Shares = 100,
-                                         StockId = 1
-            });
-            stockHolderPositions.Add(new StockHolderPosition()
-                                     {
-                                         StockHolderId = "Priel",
-                                         CostBasis = 6990.13,
-                                         Shares = 25,
-                                         StockId = 1
-            });
-            stockHolderPositions.Add(new StockHolderPosition()
-                                     {
-                                         StockHolderId = "Steve",
-                                         CostBasis = 523.43,
-                                         Shares = 50,
-                                         StockId = 1
-            });
-
-            return stockHolderPositions;
+            return new List<StockOrder>()
+                   {
+                       new StockOrder()
+                       {
+                           StockOrderId = 1,
+                           StockId = Microsoft,
+                           Shares = 5,
+                           OrderType = OrderType.Limit,
+                           TransactionType = TransactionType.Buy,
+                           TimeInForce = TimeInForce.ThirtyDays,
+                           StopLimitPrice = 80,
+                       },
+                       new StockOrder()
+                       {
+                           StockOrderId = 2,
+                           StockId = Google,
+                           Shares = 3,
+                           OrderType = OrderType.Market,
+                           TransactionType = TransactionType.Sell,
+                           TimeInForce = TimeInForce.EndOfDay,
+                           StopLimitPrice = 110,
+                       },
+                   };
         }
-        #endregion
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityServer4.Models;
+using Duende.IdentityServer.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,7 +36,7 @@ namespace Stock.IdentityServer.Extensions
         }
 
         public static IServiceCollection ConfigureCorsPolicy(this IServiceCollection services, List<string> allowed, IConfiguration configuration)
-        { ;
+        {
             string myself = configuration.GetValue("IdentityServer:Authority", string.Empty);
 
             if (!string.IsNullOrEmpty(myself) && !allowed.Contains(myself))

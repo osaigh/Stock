@@ -1,10 +1,10 @@
-import React, { useEffect, useState,useContext } from 'react';
+import { useState, useContext } from 'react';
 import "./navbar.scss"
 import MenuIcon from '@mui/icons-material/Menu';
 import { useDispatch } from 'react-redux';
 import { toggleState } from '../../slices/sidebar-slice';
 import { UserAuthenticationContext } from "../../context/user-manager-context";
-import "bootstrap/dist/css/bootstrap.min.css";
+import useUser from '../../hooks/useUser';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -20,25 +20,12 @@ import MenuItem from '@mui/material/MenuItem';
 const Navbar = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
     const dispatch = useDispatch();
-    const [user, setUser] = useState(null);
-    const { userAuthenticationService } = useContext(UserAuthenticationContext);  
-
-    useEffect(() => {
-        async function getUserAsync() {
-          const user = await userAuthenticationService.getUser();
-          return user;
-        }
-    
-        getUserAsync().then((user) => {
-          setUser(user);
-        });
-      }, []);
+    const { user } = useUser();
+    const { userAuthenticationService } = useContext(UserAuthenticationContext);
 
     const menuClicked = (e)=>{
         e.preventDefault();
-        let newStatus = new Date().getTime();
-        console.log(newStatus);
-        dispatch(toggleState(newStatus));
+        dispatch(toggleState());
     }
 
     const handleCloseUserMenu = () => {
@@ -48,13 +35,13 @@ const Navbar = () => {
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
       };
-    
-    const signOut = function () {
-        userAuthenticationService.signOut();
+
+    const signOut = () => {
+        userAuthenticationService.signOut().catch((error) => console.error(error));
     };
-    
-    const signIn = function () {
-        userAuthenticationService.signIn();
+
+    const signIn = () => {
+        userAuthenticationService.signIn().catch((error) => console.error(error));
     };
 
     let headerBar;
@@ -82,15 +69,15 @@ const Navbar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem onClick={() => {signOut();}}>
-                  <Typography textAlign="center">Sign Out</Typography>
+              <MenuItem onClick={signOut}>
+                  <Typography sx={{ textAlign: 'center' }}>Sign Out</Typography>
                 </MenuItem>
             </Menu>
           </Box>
         );
     }else{
         headerBar = (
-            <Button color="inherit" onClick={() => {signIn();}}>Login</Button>
+            <Button color="inherit" onClick={signIn}>Login</Button>
         );
     }
 
@@ -109,7 +96,7 @@ const Navbar = () => {
                 <MenuIcon />
                 </IconButton>
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                
+
                 </Typography>
                 {headerBar}
             </Toolbar>

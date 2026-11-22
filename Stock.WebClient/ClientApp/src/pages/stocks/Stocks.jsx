@@ -1,16 +1,18 @@
-import React, {useState,useContext,useEffect} from "react";
-import { UserAuthenticationContext } from "../../context/user-manager-context";
+import { useState, useContext, useEffect, useMemo, useCallback, useRef } from "react";
 import { StockApiContext } from "../../context/stock-api-context";
+import useUser from "../../hooks/useUser";
+import Alert from '@mui/material/Alert';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import Chart from "../../components/chart/Chart";
-import moment from "moment";
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import { Link } from "react-router-dom";
 import Datatable from "../../components/datatable/Datatable";
 import PageTemplate from "../templates/PageTemplate";
+
+const refreshIntervalMs = 5000;
 
 const getTableData = (stockPositions) =>{
     if(!stockPositions){
@@ -47,7 +49,7 @@ const columns = [
       headerName: "Shares",
       width: 100,
     },
-  
+
     {
       field: "currentPrice",
       headerName: "Last",
@@ -67,6 +69,7 @@ const columns = [
       field: "gainLossPercent",
       headerName: "Gain/Loss %",
       width: 200,
+      display: "flex",
       renderCell: (params) => {
         return (
           <div
@@ -84,105 +87,116 @@ const columns = [
     },
   ];
 
-const getChart = (lineChartData) =>{
-    let chart = (<div></div>);
-    let data = [];
-    if (lineChartData != null && lineChartData.data.length > 0) {
-        let chartLabels = [];
-        let chartSeries = [];
-        let max = 0;
-        let min = 200000000;
-      lineChartData.data.forEach((stockHistory) => {
-        chartLabels.push(moment(stockHistory.date).format("L"));
-          chartSeries.push(stockHistory.price);
-          data.push({
-              date: moment(stockHistory.date).format("L"),
-              price: stockHistory.price
-          });
-        if (stockHistory.price > max) {
-          max = stockHistory.price;
-        }
-        if (stockHistory.price < min) {
-          min = stockHistory.price;
-        }
-      });
-  
-      max = Math.ceil(max);
-      min = Math.floor(min) - 10;
-      if (min < 0) {
-        min = 0;
-      }
-      chart = (
-        <Card sx={{width: "100%", height:"330px"}}>
-          <CardHeader title={lineChartData.title}>
-        
-          </CardHeader>
-          <CardContent>
-                  <Chart aspect={2 / 1} data={data} />
-          </CardContent>
-        </Card>
-      );
+const chartDateFormat = new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+});
 
+// Formats an API date as MM/DD/YYYY in local time.
+const formatChartDate = (value) => {
+    // Date parses a date without a time ("2024-01-31") as UTC, which can shift it by a day.
+    const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    const date = dateOnly
+        ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
+        : new Date(value);
+
+    return Number.isNaN(date.getTime()) ? String(value) : chartDateFormat.format(date);
+}
+
+const getChart = (lineChartData) =>{
+    if (lineChartData.data.length === 0) {
+        return (<div></div>);
     }
 
-    return chart;
+    const data = lineChartData.data.map((stockHistory) => ({
+        date: formatChartDate(stockHistory.date),
+        price: stockHistory.price
+    }));
+
+    return (
+        <Card sx={{width: "100%", height:"330px"}}>
+          <CardHeader title={lineChartData.title}>
+
+          </CardHeader>
+          <CardContent>
+                  <Chart data={data} />
+          </CardContent>
+        </Card>
+    );
 }
 
 function Stocks() {
-    const [user, setUser] = useState(null);
-    const { userAuthenticationService } = useContext(UserAuthenticationContext);  
-    const [lineChartData, setLineChartData] = useState({ title: "", data: [] });
-    const [stockPositions, setStockPositions] = useState({user:null, stockPositionData:[]});
+    const { user } = useUser();
     const { stockApiService } = useContext(StockApiContext);
+    const [lineChartData, setLineChartData] = useState({ title: "", data: [] });
+    const [stockPositions, setStockPositions] = useState([]);
+    const [errorMessage, setErrorMessage] = useState("");
+    const latestHistoryRequest = useRef(0);
 
       useEffect(() => {
-        const interval = setInterval(async () => {
-          let _user =await userAuthenticationService.getUserIdentity();
-          if(_user){
-              stockApiService.getAllStockPositions(_user.access_token).then((response) => {
-                  setStockPositions({ user: _user, stockPositionData: response.data });
-              });
-          }
-          
-        }, 5000);
-    
-        return () => clearInterval(interval);
-      }, [stockPositions]);
+        if(!user){
+            return undefined;
+        }
 
-      const viewHistory = (stockId) => {
-        if (stockPositions.user == null) {
-          return;
-         }
-    
-        var stock = null;
-        stockPositions.stockPositionData.forEach((st) => {
-          if (st.stockId == stockId) {
-            stock = st;
-          }
-        });
-    
-        if (stock == null) {
+        let active = true;
+
+        const loadStockPositions = async () => {
+            try{
+                const response = await stockApiService.getAllStockPositions(user.access_token);
+                if(active){
+                    setStockPositions(response.data);
+                    setErrorMessage("");
+                }
+            }catch{
+                // Not logged: this runs every few seconds and the browser already reports the failed request.
+                if(active){
+                    setErrorMessage("Unable to load the stock positions.");
+                }
+            }
+        };
+
+        loadStockPositions();
+        const interval = setInterval(loadStockPositions, refreshIntervalMs);
+
+        return () => {
+            active = false;
+            clearInterval(interval);
+        };
+      }, [user, stockApiService]);
+
+      const viewHistory = useCallback(async (stockId) => {
+        if (!user) {
           return;
         }
-    
-        stockApiService.getStockHistory(stockId,stockPositions.user.access_token).then((response) => {
-          var stockHistoryCollection = response.data;
-          var newLineChartData = {
-            title: stock.stockId,
-            data: stockHistoryCollection,
-          };
-          setLineChartData(newLineChartData);
-        });
-      };
 
-      const actionColumn = [
+        // Only the most recently requested history is shown.
+        const request = ++latestHistoryRequest.current;
+        try{
+            const response = await stockApiService.getStockHistory(stockId, user.access_token);
+            if(request === latestHistoryRequest.current){
+                setLineChartData({
+                    title: stockId,
+                    data: response.data,
+                });
+            }
+        }catch(error){
+            console.error(error);
+            if(request === latestHistoryRequest.current){
+                setErrorMessage(`Unable to load the price history for ${stockId}.`);
+            }
+        }
+      }, [user, stockApiService]);
+
+      const allColumns = useMemo(() => columns.concat([
         {
           field: "action",
           headerName: "Action",
           width: 220,
+          display: "flex",
           renderCell: (params) => {
             return (
-              <Stack direction="row" alignItems="center" gap={2}>
+              <Stack direction="row" sx={{alignItems:"center", gap:2}}>
                 <Link to={`/order/${params.row.stockId}/buy`} style={{ textDecoration: "none" }}>
                     <Box sx={{
                         padding: '2px 5px',
@@ -214,31 +228,34 @@ function Stocks() {
                             cursor: 'pointer',
                         }}>
                         View History
-                    </Box> 
+                    </Box>
                 </Box>
               </Stack>
             );
           },
         },
-      ];
-    
-      const tableData =  getTableData(stockPositions.stockPositionData);
-      
+      ]), [viewHistory]);
+
+      const tableData = useMemo(() => getTableData(stockPositions), [stockPositions]);
+
       const chart = getChart(lineChartData);
-     
+
   return (
     <PageTemplate>
         <Card sx={{width: "100%", }}>
           <CardHeader title="Stock Positions">
-        
+
           </CardHeader>
           <CardContent>
-            <Datatable height="400px" rowData={tableData} columns={columns.concat(actionColumn)}>
+            {errorMessage &&
+                <Alert severity="error" sx={{marginBottom:2}}>{errorMessage}</Alert>
+            }
+            <Datatable height="400px" rowData={tableData} columns={allColumns}>
 
             </Datatable>
           </CardContent>
         </Card>
-        
+
         {chart}
     </PageTemplate>
   )

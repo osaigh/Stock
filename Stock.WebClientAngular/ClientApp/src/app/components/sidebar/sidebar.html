@@ -1,0 +1,19 @@
+<div [class]="classList().sidebar">
+  <div class="top">
+    <a class="homelink" routerLink="/" style="text-decoration: none">
+      <span [class]="classList().brand">Stock Apex</span>
+    </a>
+  </div>
+  <hr />
+  <div class="center">
+    <ul>
+      <p [class]="classList().heading">Main</p>
+      <a routerLink="/" style="text-decoration: none">
+        <li>
+          <span class="icon"><i class="fa-solid fa-house"></i></span>
+          <span [class]="classList().span">Home</span>
+        </li>
+      </a>
+    </ul>
+  </div>
+</div>

@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Stock.API.Data;
 using Stock.API.Models;
@@ -14,14 +13,12 @@ namespace Stock.API.Repository
     {
         #region fields
         private readonly StockDbContext _StockDbContext;
-        private readonly IMapper _Mapper;
         #endregion
 
         #region Constructor
-        public StockPositionRepository(StockDbContext stockDbContext, IMapper mapper)
+        public StockPositionRepository(StockDbContext stockDbContext)
         {
             _StockDbContext = stockDbContext;
-            _Mapper = mapper;
         }
         #endregion
 
@@ -87,7 +84,7 @@ namespace Stock.API.Repository
 
         public async Task<IEnumerable<StockPosition>> SearchForAsync(Expression<Func<StockPosition, bool>> predicate)
         {
-            var stockPositions = await _StockDbContext.StockPositions
+            var stockPositions = await _StockDbContext.StockPositions.Include(sp => sp.Stock)
                                         .Where(predicate).ToListAsync();
 
             foreach (var stockPosition in stockPositions)
@@ -118,7 +115,11 @@ namespace Stock.API.Repository
             var stockPosition = await _StockDbContext.StockPositions.Include(sp => sp.Stock)
                                         .FirstOrDefaultAsync(s => s.StockPositionId == key);
 
-            stockPosition.CurrentPrice = stockPosition.Stock.Price;
+            if (stockPosition != null)
+            {
+                stockPosition.CurrentPrice = stockPosition.Stock.Price;
+            }
+
             return stockPosition;
         }
 
@@ -134,7 +135,7 @@ namespace Stock.API.Repository
 
             if (!ReferenceEquals(stockPosition, _stockPosition))
             {
-                _Mapper.Map(stockPosition, _stockPosition);
+                _StockDbContext.Entry(_stockPosition).CurrentValues.SetValues(stockPosition);
             }
 
             await _StockDbContext.SaveChangesAsync();

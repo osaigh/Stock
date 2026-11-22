@@ -1,14 +1,5 @@
-import { Action } from '@ngrx/store';
+import { createAction } from '@ngrx/store';
 
-export enum ActionTypes {
-    ToggleState = '[App Component] ToggleState',
-    OnAppClicked = '[App Component] OnAppClicked',
-  }
-   
-  export class ToggleState implements Action {
-    readonly type = ActionTypes.ToggleState;
-  }
-   
-  export class OnAppClicked implements Action {
-    readonly type = ActionTypes.OnAppClicked;
-  }
+export const toggleState = createAction('[App Component] ToggleState');
+
+export const onAppClicked = createAction('[App Component] OnAppClicked');

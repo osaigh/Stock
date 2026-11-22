@@ -1,0 +1,31 @@
+<div class="home">
+  <app-sidebar />
+
+  <div [class]="contentClassList()">
+    <app-navbar />
+    <div class="content">
+      @if (isUserSignedIn()) {
+        <div class="stock-container">
+          @defer {
+            <app-stock-container />
+          }
+        </div>
+      } @else {
+        <div>
+          <h3
+            style="
+              margin-left: auto;
+              margin-right: auto;
+              margin-top: 100px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            Please Sign In
+          </h3>
+        </div>
+      }
+    </div>
+  </div>
+</div>

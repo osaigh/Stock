@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-4 ml-0 mr-0 mx-auto">
+            <div class="col-md-4 mx-auto">
                 @*<form asp-controller="Auth" asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
                     @foreach (var externalProvider in Model.ExternalProviders)
                     {
@@ -29,22 +29,22 @@
                 <form asp-action="Login" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <input type="hidden" asp-for="ReturnUrl"/>
-                    <div class="form-group">
-                        <label asp-for="Username" class="control-label"></label>
-                        <input asp-for="Username" class="form-control"/>
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label"></label>
+                        <input asp-for="Username" class="form-control" autocomplete="username" autofocus/>
                         <span asp-validation-for="Username" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="Password" class="control-label"></label>
-                        <input asp-for="Password" class="form-control" type="password"/>
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" type="password" autocomplete="current-password"/>
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <div style="display:flex; align-items:center; justify-content:space-between">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center justify-content-between">
                             <input type="submit" value="Login" class="btn btn-primary"/>
-                        <div>
-    <a asp-controller="Auth" asp-action="Register" >Register</a>
-</div>
+                            <div>
+                                <a asp-controller="Auth" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl">Register</a>
+                            </div>
                         </div>
                     </div>
                 </form>

@@ -1,21 +1,12 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using AutoMapper.Configuration;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 using Stock.IdentityServer.Data;
 using Stock.IdentityServer.Extensions;
 using Stock.IdentityServer.Extensions.Microsoft.Extensions.DependencyInjection;
@@ -43,8 +34,6 @@ namespace Stock.IdentityServer
 
             //string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            string migrationsAssembly = typeof(Startup).Assembly.GetName().Name;
-
             services.AddDbContext<ApplicationDbContext>(config =>
                                                         {
                                                             //config.UseSqlServer(connectionString);
@@ -61,39 +50,41 @@ namespace Stock.IdentityServer
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
             
-            services.ConfigureApplicationCookie(config =>
-                                                {
-                                                    config.Cookie.Name = "Identity.Cookie";
-                                                    config.LoginPath = "/Auth/Login";
-                                                    config.LogoutPath = "/Auth/Logout";
-                                                    config.Cookie.SameSite = SameSiteMode.None;
-                                                    config.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-                                                });
-
             services.ConfigureNonBreakingSameSiteCookies();
 
-            var assembly = typeof(Startup).Assembly.GetName().Name;
-            var filePath = Path.Combine(_environment.ContentRootPath, "stock.pfx");
-            //var cert = new X509Certificate2(filePath,"Password@1");
-
-            services.AddIdentityServer()
+            services.AddIdentityServer(options =>
+                                       {
+                                           options.UserInteraction.LoginUrl = "/Auth/Login";
+                                           options.UserInteraction.LogoutUrl = "/Auth/Logout";
+                                           options.Authentication.CheckSessionCookieSameSiteMode = SameSiteMode.Lax;
+                                           //The signing key comes from AddDeveloperSigningCredential below
+                                           options.KeyManagement.Enabled = false;
+                                       })
                     .AddAspNetIdentity<ApplicationUser>()
-                    /*.AddConfigurationStore(options =>
-                                           {
-                                               options.ConfigureDbContext = b => b.UseSqlServer(connectionString,
-                                                                                                sql => sql.MigrationsAssembly(migrationsAssembly));
-                                           })
-                    .AddOperationalStore(options =>
-                                         {
-                                             options.ConfigureDbContext = b => b.UseSqlServer(connectionString,
-                                                                                              sql => sql.MigrationsAssembly(migrationsAssembly));
-                                         })*/
-                    //.AddSigningCredential(cert)
+                    //To keep the clients, resources and grants in SQL Server instead of in memory, add the
+                    //Duende.IdentityServer.EntityFramework package and use AddConfigurationStore/AddOperationalStore here
                     .AddInMemoryApiScopes(Configuration.GetApiScopes())
                     //.AddInMemoryApiResources(Configuration.GetApiResources())
                     .AddInMemoryIdentityResources(Configuration.GetIdentityResources())
                     .AddInMemoryClients(Configuration.GetClients())
                     .AddDeveloperSigningCredential();
+
+            //This has to come after AddAspNetIdentity, which sets the cookies to SameSite=None.
+            //The server runs on plain http for local development and browsers only accept
+            //SameSite=None cookies over https. Lax is enough for the redirect based sign in.
+            services.ConfigureApplicationCookie(config =>
+                                                {
+                                                    config.Cookie.Name = "Identity.Cookie";
+                                                    config.LoginPath = "/Auth/Login";
+                                                    config.LogoutPath = "/Auth/Logout";
+                                                    config.Cookie.SameSite = SameSiteMode.Lax;
+                                                    config.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                                                });
+            services.ConfigureExternalCookie(config =>
+                                             {
+                                                 config.Cookie.SameSite = SameSiteMode.Lax;
+                                                 config.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                                             });
 
             //services.AddAuthentication()
             //        .AddFacebook(config =>
@@ -102,19 +93,7 @@ namespace Stock.IdentityServer
             //                         config.AppSecret = "";
             //                     });
 
-            services.ConfigureCorsPolicy(new List<string>(){ "https://localhost:44700", "http://localhost:44602", "http://127.0.0.1:44800", "http://localhost:44902" }, _configuration);
-
-            //services.AddCors(options =>
-            //                 {
-            //                     // this defines a CORS policy called "default"
-            //                     options.AddPolicy("default", policy =>
-            //                                                  {
-            //                                                      policy.WithOrigins("http://localhost:44321")
-            //                                                            .AllowAnyHeader()
-            //                                                            .AllowAnyMethod();
-            //                                                  });
-            //                 });
-
+            services.ConfigureCorsPolicy(Configuration.GetClients().ToList(), _configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -128,12 +107,13 @@ namespace Stock.IdentityServer
 
             app.UseCookiePolicy();
 
+            app.UseStaticFiles();
+
             app.UseRouting();
 
-            app.UseStaticFiles();
             app.UseCors("ucwCorsPolicy");
-            app.UseAuthentication();
             app.UseIdentityServer();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
                              {

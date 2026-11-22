@@ -1,145 +1,88 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
 using Stock.API.Controllers.api;
 using Stock.API.Repository;
+using Xunit;
 using DAOs = Stock.API.Models;
 using DTOs = Stock.Models;
-using Xunit;
-using System.Threading.Tasks;
-using AutoMapper;
-using Moq;
 
 namespace Stock.API.Tests.UnitTests
 {
     public class StockControllerUnitTests
     {
-        #region Fields
-
-        #endregion
-
-        #region Constructor
-        public StockControllerUnitTests()
-        {
-
-        }
-        #endregion
-
-        #region Methods
-
         [Fact]
         public async Task Get_NoArgument_ReturnsStockCollection()
         {
             //Arrange
-
-            //AutoMapper
-            var mapper = GetMapper();
-
-            //Stock Repo
-            var mockRepo = new Mock<IRepository<DAOs.Stock>>();
-            mockRepo.Setup(repo => repo.GetAllAsync()).ReturnsAsync(Utilities.GetTestStocks());
-
-            //Controller
-            var stockController = new StockController(mockRepo.Object, mapper);
+            var stockController = new StockController(GetStockRepository());
 
             //Act
-            var stocks = await stockController.Get();
+            var result = await stockController.Get();
 
             //Assert
-            Assert.NotNull(stocks);
-            Assert.Equal(2, stocks.Count());
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var stocks = Assert.IsAssignableFrom<IEnumerable<DTOs.Stock>>(okResult.Value);
+            Assert.Equal(new[] { Utilities.Microsoft, Utilities.Google }, stocks.Select(s => s.StockId));
         }
 
         [Theory]
-        [InlineData(1)]
-        public async Task Get_ValidStockId_ReturnsStock(int stockId)
+        [InlineData(Utilities.Microsoft, 85)]
+        [InlineData(Utilities.Google, 105)]
+        public async Task Get_ValidStockId_ReturnsStock(string stockId, double price)
         {
             //Arrange
-
-            //AutoMapper
-            var mapper = GetMapper();
-
-            //Stock Repo
-            var mockRepo = new Mock<IRepository<DAOs.Stock>>();
-            mockRepo.Setup(repo => repo.GetAsync(It.IsAny<object>())).ReturnsAsync((object id) =>
-                                                                                   {
-                                                                                       var _id = int.Parse(id.ToString());
-                                                                                       return Utilities.GetTestStocks()
-                                                                                                       .FirstOrDefault(s => s.Id == _id);
-                                                                                   });
-
-            var stockController = new StockController(mockRepo.Object, mapper);
+            var stockController = new StockController(GetStockRepository());
 
             //Act
-            var stock = await stockController.Get(stockId);
+            var result = await stockController.Get(stockId);
 
             //Assert
-            Assert.NotNull(stock);
-            Assert.Equal(1, stock.Id);
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var stock = Assert.IsType<DTOs.Stock>(okResult.Value);
+            Assert.Equal(stockId, stock.StockId);
+            Assert.Equal(price, stock.Price);
+        }
+
+        [Fact]
+        public async Task Get_UnknownStockId_ReturnsNotFound()
+        {
+            //Arrange
+            var stockController = new StockController(GetStockRepository());
+
+            //Act
+            var result = await stockController.Get("Unknown");
+
+            //Assert
+            Assert.IsType<NotFoundObjectResult>(result.Result);
         }
 
         [Theory]
-        [InlineData(1098)]
-        public async Task Get_InvalidStockId_ReturnsNull(int stockId)
+        [InlineData("")]
+        [InlineData(null)]
+        public async Task Get_EmptyStockId_ReturnsBadRequest(string stockId)
         {
             //Arrange
-
-            //AutoMapper
-            var mapper = GetMapper();
-
-            //Stock Repo
-            var mockRepo = new Mock<IRepository<DAOs.Stock>>();
-            mockRepo.Setup(repo => repo.GetAsync(It.IsAny<object>())).ReturnsAsync((object id) =>
-                                                                                   {
-                                                                                       var _id = int.Parse(id.ToString());
-                                                                                       return Utilities.GetTestStocks()
-                                                                                                       .FirstOrDefault(s => s.Id == _id);
-                                                                                   });
-
-            var stockController = new StockController(mockRepo.Object, mapper);
+            var stockController = new StockController(GetStockRepository());
 
             //Act
-            var stock = await stockController.Get(stockId);
+            var result = await stockController.Get(stockId);
 
             //Assert
-            Assert.Null(stock);
+            Assert.IsType<BadRequestObjectResult>(result.Result);
         }
 
-        #endregion
-
-        #region Helpers
-        private IMapper GetMapper()
+        private static IRepository<DAOs.Stock> GetStockRepository()
         {
-            //AutoMapper
-            var mockMapper = new Mock<IMapper>();
-            mockMapper.Setup(mapper => mapper.Map<DTOs.Stock>(It.IsAny<DAOs.Stock>())).Returns((DAOs.Stock input) =>
-            {
-                var dtoStock = new DTOs.Stock
-                {
-                    Id = input.Id,
-                    Name = input.Name,
-                    Price = input.Price
-                };
+            var stocks = Utilities.GetTestStocks();
+            var mockRepo = new Mock<IRepository<DAOs.Stock>>();
+            mockRepo.Setup(repo => repo.GetAllAsync()).ReturnsAsync(stocks);
+            mockRepo.Setup(repo => repo.GetAsync(It.IsAny<object>()))
+                    .ReturnsAsync((object id) => stocks.FirstOrDefault(s => s.StockId == id.ToString()));
 
-                return dtoStock;
-            });
-
-            mockMapper.Setup(mapper => mapper.Map<List<DTOs.Stock>>(It.IsAny<List<DAOs.Stock>>())).Returns((List<DAOs.Stock> inputs) =>
-            {
-                return inputs.Select(input => new DTOs.Stock()
-                {
-                    Id = input.Id,
-                    Name = input.Name,
-                    Price = input.Price
-                })
-                                        .ToList();
-            });
-
-            return mockMapper.Object;
+            return mockRepo.Object;
         }
-
-        #endregion
     }
 }

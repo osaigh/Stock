@@ -1,31 +1,40 @@
-import React ,{useContext} from 'react';
+import { useContext, useState } from 'react';
+import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import {Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import { UserAuthenticationContext } from "../../context/user-manager-context";
 
 function Login() {
-    const { userAuthenticationService } = useContext(UserAuthenticationContext);  
-    const signIn = function () {
-        userAuthenticationService.signIn();
+    const { userAuthenticationService } = useContext(UserAuthenticationContext);
+    const [signInFailed, setSignInFailed] = useState(false);
+
+    const signIn = async () => {
+        setSignInFailed(false);
+        try {
+            await userAuthenticationService.signIn();
+        } catch (error) {
+            console.error(error);
+            setSignInFailed(true);
+        }
     };
 
   return (
     <Stack
         direction="row"
-        justifyContent="center"
-        alignItems="center"
         sx={{
+            justifyContent:"center",
+            alignItems:"center",
             width:"100vw",
             height:"100vh"
         }}
     >
         <Stack
         direction="column"
-        justifyContent="center"
-        alignItems="center"
         spacing={6}
             sx={{
+                justifyContent:"center",
+                alignItems:"center",
                 marginLeft:"auto",
                 marginRight:"auto",
                 width: 400,
@@ -42,15 +51,17 @@ function Login() {
             >
                     Stock Trader
             </Typography>
-            <Stack 
+            <Stack
                 direction="column"
-                alignItems="center"
                 spacing={2}
-                sx={{width:300}}>
-                <Button variant="contained" size='large' fullWidth onClick={() => {signIn();}}>Sign In</Button> 
+                sx={{alignItems:"center", width:300}}>
+                <Button variant="contained" size='large' fullWidth onClick={signIn}>Sign In</Button>
                 <Button variant="outlined" href={userAuthenticationService.getSignUpEndPoint()} target="_blank" size='large' fullWidth>Create Account</Button>
+                {signInFailed &&
+                    <Alert severity="error" sx={{width:"100%"}}>Unable to reach the sign-in service.</Alert>
+                }
             </Stack>
-            
+
         </Stack>
     </Stack>
   )

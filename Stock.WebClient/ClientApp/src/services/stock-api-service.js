@@ -1,83 +1,33 @@
 import axios from "axios";
 
+const authorization = (accessToken) => ({
+  headers: { Authorization: `Bearer ${accessToken}` },
+});
+
 export default class StockApiService {
-  baseURL;
+  client;
 
-  constructor(_baseURL) {
-    this.baseURL = _baseURL;
+  constructor(baseURL) {
+    this.client = axios.create({ baseURL });
   }
 
-  getAllStocks = (accessToken = "") => {
-
-      if (accessToken.length > 0) {
-          const config = {
-              headers: { Authorization: `Bearer ${accessToken}` }
-          };
-          return axios.get(this.baseURL + "stock", config);
-      } else {
-          return axios.get(this.baseURL + "stock");
-      }
-    
+  getAllStockPositions = (accessToken) => {
+    return this.client.get("StockPosition", authorization(accessToken));
   };
 
-  getAllStockPositions = (accessToken = "") => {
-
-    if (accessToken.length > 0) {
-        const config = {
-            headers: { Authorization: `Bearer ${accessToken}` }
-        };
-        return axios.get(this.baseURL + "StockPosition", config);
-    } else {
-        return axios.get(this.baseURL + "StockPosition");
-    }
-  
-};
-
-    getAllStockOrders = (accessToken = "") => {
-
-    if (accessToken.length > 0) {
-        const config = {
-            headers: { Authorization: `Bearer ${accessToken}` }
-        };
-        return axios.get(this.baseURL + "StockOrder", config);
-    } else {
-        return axios.get(this.baseURL + "StockOrder");
-    }
-  
-};
-
-  createStockOrder = (accessToken = "", stockOrder) =>{
-    if (accessToken.length > 0) {
-        const config = {
-            headers: { 
-                Authorization: `Bearer ${accessToken}`, 
-                'Accept': 'application/json',
-                'Content-Type': 'application/json' 
-            }
-        };
-        return axios.post(this.baseURL + "StockOrder", stockOrder, config);
-    } else {
-        return axios.post(this.baseURL + "StockOrder", stockOrder);
-    }
-  }
-
-  createStock = (newObject) => {
-    return axios.post(this.baseURL, newObject);
+  getAllStockOrders = (accessToken) => {
+    return this.client.get("StockOrder", authorization(accessToken));
   };
 
-  updateStock = (id, newObject) => {
-    return axios.put(`${this.baseURL}/${id}`, newObject);
+  // stockOrderRequest is { requestId, jsonString }; axios serialises it as JSON.
+  createStockOrder = (accessToken, stockOrderRequest) => {
+    return this.client.post("StockOrder", stockOrderRequest, authorization(accessToken));
   };
 
-  getStockHistory = (stockId, accessToken = "") => {
-        if (accessToken.length > 0) {
-            const config = {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            };
-            return axios.get(this.baseURL + "stockHistory/" + stockId, config);
-        } else {
-            return axios.get(this.baseURL + "stockHistory/" + stockId);
-        }
-    
+  getStockHistory = (stockId, accessToken) => {
+    return this.client.get(
+      `StockHistory/${encodeURIComponent(stockId)}`,
+      authorization(accessToken)
+    );
   };
 }

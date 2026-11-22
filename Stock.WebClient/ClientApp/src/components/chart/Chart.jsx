@@ -1,11 +1,9 @@
-import React from 'react';
 import './chart.scss';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const toDollars = (decimal) => `$${(decimal).toFixed(0)}`;
 
-
-const Chart = ({ aspect, title, data }) => {
+const Chart = ({ title, data }) => {
     return (
         <div className="chart">
       <div className="title">{title}</div>
@@ -24,9 +22,9 @@ const Chart = ({ aspect, title, data }) => {
               <Tooltip />
               <Legend />
               <Line type="monotone" dataKey="price" stroke="#8884d8" activeDot={{ r: 8 }} />
-              
+
             </LineChart>
-            
+
         </ResponsiveContainer>
       </div>
     </div>

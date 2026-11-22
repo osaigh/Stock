@@ -1,4 +1,3 @@
-import React, {useState,useContext,useEffect} from "react";
 import StockOrder from "../../components/order/StockOrder";
 import PageTemplate from "../templates/PageTemplate";
 

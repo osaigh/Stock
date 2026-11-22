@@ -1,18 +1,15 @@
-export interface Stock{
-    id:number,
-    name:string,
-    price:number,
-    volume:number
+export interface Stock {
+  stockId: string;
+  price: number;
 }
 
-export interface StockHistory{
-    id:number,
-    date:string,
-    price:number,
-    stockId:number
+export interface StockHistory {
+  stockHistoryId: number;
+  stockId: string;
+  date: string;
+  price: number;
 }
 
-export interface UserInterface{
-    username:string,
-
+export interface UserInterface {
+  username: string;
 }

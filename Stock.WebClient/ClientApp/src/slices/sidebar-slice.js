@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 export const sidebarSlice = createSlice({
   name: "sidebar",
@@ -6,21 +6,11 @@ export const sidebarSlice = createSlice({
     status: "",
   },
   reducers: {
-    toggleState: (state, action) => {
-      const newState = { ...state };
-      if (newState.status == "hide") {
-        newState.status = "";
-      } else {
-        newState.status = "hide";
-      }
-
-      return newState;
+    toggleState: (state) => {
+      state.status = state.status === "hide" ? "" : "hide";
     },
-    onAppClicked: (state, action) => {
-      const newState = { ...state };
-      newState.status = "";
-
-      return newState;
+    onAppClicked: (state) => {
+      state.status = "";
     },
   },
 });

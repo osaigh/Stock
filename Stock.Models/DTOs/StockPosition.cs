@@ -12,6 +12,6 @@ namespace Stock.Models
         public string StockId { get; set; }
         public double CurrentPrice { get; set; }
         public double MarketValue { get { return Math.Round(Shares * CurrentPrice,2); } }
-        public double GainLossPercent { get { return Math.Round(((CurrentPrice * Shares - CostBasis) * 100 / CostBasis),2); } }
+        public double GainLossPercent { get { return CostBasis == 0 ? 0 : Math.Round(((CurrentPrice * Shares - CostBasis) * 100 / CostBasis),2); } }
     }
 }

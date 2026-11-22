@@ -5,6 +5,7 @@ using Stock.WpfClient.Common.Events;
 using Stock.WpfClient.Common.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -100,7 +101,7 @@ namespace Stock.WpfClient.Authentication.ViewModels
                          }
                          catch (Exception ex)
                          {
-                             string t = "";
+                             Debug.WriteLine(ex);
                          }
                          
                      });
@@ -108,9 +109,16 @@ namespace Stock.WpfClient.Authentication.ViewModels
 
         protected void OnSignOutExecuted()
         {
-            Task.Run(() =>
+            Task.Run(async () =>
                      {
-                         _AuthenticationService.SignOut();
+                         try
+                         {
+                             await _AuthenticationService.SignOut();
+                         }
+                         catch (Exception ex)
+                         {
+                             Debug.WriteLine(ex);
+                         }
                      });
 
             //Raise SignedOut Event
@@ -136,8 +144,10 @@ namespace Stock.WpfClient.Authentication.ViewModels
             }
             else
             {
-                //log error
-
+                string errors = signInResult.Errors != null ? string.Join(Environment.NewLine, signInResult.Errors) : string.Empty;
+                Debug.WriteLine(errors);
+                MessageBox.Show($"Unable to sign in. Make sure Stock.IdentityServer is running.{Environment.NewLine}{Environment.NewLine}{errors}",
+                                "Stock WPF", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
